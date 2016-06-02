@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TrainSchedule</string>
+    <string name="make_timetable">時刻表を作成</string>
+    <string name="make_character">キャラクターを作成</string>
+    <string name="change_character">キャラクターを変更</string>
+    <string name="hour">時</string>
+    <string name="minute">分</string>
+</resources>

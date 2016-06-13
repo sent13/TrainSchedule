@@ -1,21 +1,24 @@
 package io.sent.trainschedule;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
+
+import java.io.Serializable;
 
 /**
  * Created by sent13 on 16/05/29.
  */
-public class Character {
+public class Character implements Serializable{
 
-    Bitmap bitmap;
-    String maeoki, atama, gobi, owari;
+    Uri imageUri;            //キャラクター画像が保存されているパス
+    String name,normalText, noTrainText, noCheckedText;
 
-    public Character(Bitmap bitmap,String maeoki, String atama, String gobi, String owari){
-        this.bitmap=bitmap;
-        this.maeoki=maeoki;
-        this.atama=atama;
-        this.gobi=gobi;
-        this.owari=owari;
+    public Character(Uri imageUri,String name, String normalText, String noTrainText, String noCheckedText){
+        this.name=name;
+        this.imageUri=imageUri;
+        this.normalText=normalText;
+        this.noTrainText=noTrainText;
+        this.noCheckedText=noCheckedText;
     }
 
 }

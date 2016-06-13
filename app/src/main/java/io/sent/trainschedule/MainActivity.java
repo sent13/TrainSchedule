@@ -2,10 +2,15 @@ package io.sent.trainschedule;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -20,6 +25,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -44,8 +52,15 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     Timetable timetable;
 
+    int selectedCharacter=0;    //選択されているキャラの添字
+
+    ArrayList<Character> charaList;
+
     static final int TRAIN_START_TIME=5;
     static final int TRAIN_FINISH_TIME=24;
+    static final int REQUEST_CHARA_MAKE=1000;
+    static final int REQUEST_CHARA_SELECT=1020;
+    static final int REQUEST_TIMETABLE_SELECT=1040;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
         findViews();
         initViews();
     }
@@ -78,6 +94,19 @@ public class MainActivity extends AppCompatActivity {
 
     //各ビューの初期設定
     private void initViews() {
+
+        charaList=new ArrayList<>();
+        Uri defCharaUri=Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                getResources().getResourcePackageName(R.drawable.unknown) + '/' +
+                getResources().getResourceTypeName(R.drawable.unknown) + '/' +
+                getResources().getResourceEntryName(R.drawable.unknown) );
+        String defCharaNormal="次のshurui電車の時刻はtimeです。";
+        String defCharaNoTrain="次の電車はありません。";
+        String defCharaNoChecked="チェックが入っていません。";
+        charaList.add(new Character(defCharaUri,"Unknown",defCharaNormal,defCharaNoTrain,defCharaNoChecked));
+
+
+
         numberPicker1.setMinValue(TRAIN_START_TIME);
         numberPicker1.setMaxValue(TRAIN_FINISH_TIME);
         numberPicker1.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
@@ -87,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         calendar=Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         imageView1.setImageResource(R.drawable.fukidasi);
-        imageView2.setImageResource(R.drawable.nanaturao1);
+        imageView2.setImageResource(R.drawable.unknown);
         adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         adapter.add("長尾駅尼崎方面");
@@ -175,10 +204,18 @@ public class MainActivity extends AppCompatActivity {
         Iterator iterator=daiya.iterator();
 
         if(!checkBox1.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked()){
-            textResult1.setText("チェックがないから。分からない。");
+            if(charaList.size()!=0){
+                textResult1.setText(charaList.get(selectedCharacter).noCheckedText);
+            }else {
+                textResult1.setText("チェックがないから。分からない。");
+            }
             return;
         }else if (daiya.size() == 0) {
-            textResult1.setText("次の電車は。ない。");
+            if(charaList.size()!=0){
+                textResult1.setText(charaList.get(selectedCharacter).noTrainText);
+            }else {
+                textResult1.setText("次の電車は。ない。");
+            }
             return;
         }
 
@@ -200,16 +237,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (complete) {
-            textResult1.setText("次の"+setTime.getShuruiStr()+"電車は。" + setTime.hour + "時" + setTime.minute + "分");
+            if(charaList.size() !=0){
+                textResult1.setText(replaceTrainStr(setTime));
+            }else {
+                textResult1.setText("次の" + setTime.getShuruiStr() + "電車は。" + setTime.hour + "時" + setTime.minute + "分");
+            }
         }else{
             setTime=firstShuruiTime(daiya);
             if(setTime==null) {
-                textResult1.setText("この種類での次の電車はない");
+                textResult1.setText(charaList.get(selectedCharacter).noTrainText);
             }else{
-                textResult1.setText("次の"+setTime.getShuruiStr()+"電車は。" + setTime.hour + "時" + setTime.minute + "分");
+                textResult1.setText(replaceTrainStr(setTime));
             }
         }
 
+    }
+
+    //時刻を受け取り種類と時間を置き換えた文字を返す
+    private String replaceTrainStr(Time time){
+        String str=charaList.get(selectedCharacter).normalText;
+        str=str.replaceAll("shurui",time.getShuruiStr());
+        str=str.replaceAll("time",time.hour+"時"+time.minute+"分");
+        return str;
     }
 
     //種類を受け取りチェックボックスにその種類のチェックが入っているか返す
@@ -257,18 +306,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        Intent intent=new Intent(Intent.ACTION_MAIN);
         try {
 
             switch (id) {
                 case R.id.changeCharacter:
-                    setContentView(R.layout.select_character);
+                    intent.putExtra("size",charaList.size());
+                    for(int i=0;i<charaList.size();i++){
+                        intent.putExtra("charaUri"+i, charaList.get(i).imageUri);
+                        intent.putExtra("charaName"+i, charaList.get(i).name);
+                    }
+                    startActivityForResult(this,"io.sent.trainschedule",
+                            "io.sent.trainschedule.SelectCharacterActivity",intent,REQUEST_CHARA_SELECT);
                     break;
                 case R.id.makeCharacter:
-                    startActivity(this, "io.sent.trainschedule", "io.sent.trainschedule.MakeCharacterActivity");
+                    startActivityForResult(this, "io.sent.trainschedule",
+                            "io.sent.trainschedule.MakeCharacterActivity",intent,REQUEST_CHARA_MAKE);
                     break;
                 case R.id.makeTimetable:
-                    startActivity(this, "io.sent.trainschedule", "io.sent.trainschedule.MakeTimetableActivity");
+                    startActivityForResult(this, "io.sent.trainschedule",
+                            "io.sent.trainschedule.MakeTimetableActivity",intent,REQUEST_TIMETABLE_SELECT);
                     break;
             }
         }catch(Exception e){
@@ -278,14 +335,49 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //アクティビティの起動
-    private static void startActivity(Activity activity,String packageName,
-                                      String className) throws Exception{
-        Intent intent=new Intent(Intent.ACTION_MAIN);
+    private static void startActivityForResult(Activity activity,String packageName,
+                                      String className,Intent intent,int requestCode) throws Exception{
         intent.setComponent(new ComponentName(packageName, className));
         intent.removeCategory(Intent.CATEGORY_DEFAULT);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, requestCode);
     }
+
+    //アクティビティから返ってくる値を受け取る
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        if(resultCode==RESULT_OK) {
+
+            switch (requestCode){
+                case REQUEST_CHARA_MAKE:
+                    Uri imageUri = intent.getParcelableExtra("imageUri");
+                    Bitmap charaImage = resizeImage.resize(this,imageUri);
+                    imageView2.setImageBitmap(charaImage);
+                    String name = intent.getStringExtra("name");
+                    String normal = intent.getStringExtra("normal");
+                    String noTrain = intent.getStringExtra("noTrain");
+                    String noChecked = intent.getStringExtra("noChecked");
+                    charaList.add(new Character(imageUri, name, normal, noTrain, noChecked));
+                    selectedCharacter=charaList.size()-1;
+                    textResult1.setText("" + charaList.size() + name + charaImage.getHeight() + "," + charaImage.getWidth());
+                    break;
+
+                case REQUEST_CHARA_SELECT:
+                    int charaIndex=intent.getIntExtra("index",0);
+                    selectedCharacter=charaIndex;
+                    Bitmap image=resizeImage.resize(this, charaList.get(selectedCharacter).imageUri);
+                    imageView2.setImageBitmap(image);
+                    searchTrainTime();
+                    break;
+            }
+
+
+        } else if (resultCode == RESULT_CANCELED) {
+                textResult1.setText("操作がキャンセルされました");
+        }
+
+    }
+
 
     private void toast(String text){
         if(text==null) text="";

@@ -18,15 +18,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MakeCharacterActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".MakeTimetableActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".SelectCharacterActivity"></activity>
+
+        <activity
+            android:name=".SelectCharacterActivity"
+            android:label="TrainSchedule"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

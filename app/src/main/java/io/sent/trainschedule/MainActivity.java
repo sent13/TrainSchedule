@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
 
         charaList=new ArrayList<>();
+
         Uri defCharaUri=Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
                 getResources().getResourcePackageName(R.drawable.unknown) + '/' +
                 getResources().getResourceTypeName(R.drawable.unknown) + '/' +
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         String defCharaNormal="次のshurui電車の時刻はtimeです。";
         String defCharaNoTrain="次の電車はありません。";
         String defCharaNoChecked="チェックが入っていません。";
-        charaList.add(new Character(defCharaUri,"Unknown",defCharaNormal,defCharaNoTrain,defCharaNoChecked));
+        charaList.add(new Character(defCharaUri,"デフォルト",defCharaNormal,defCharaNoTrain,defCharaNoChecked));
 
 
 
@@ -204,18 +205,10 @@ public class MainActivity extends AppCompatActivity {
         Iterator iterator=daiya.iterator();
 
         if(!checkBox1.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked()){
-            if(charaList.size()!=0){
-                textResult1.setText(charaList.get(selectedCharacter).noCheckedText);
-            }else {
-                textResult1.setText("チェックがないから。分からない。");
-            }
+            textResult1.setText(charaList.get(selectedCharacter).noCheckedText);
             return;
         }else if (daiya.size() == 0) {
-            if(charaList.size()!=0){
-                textResult1.setText(charaList.get(selectedCharacter).noTrainText);
-            }else {
-                textResult1.setText("次の電車は。ない。");
-            }
+            textResult1.setText(charaList.get(selectedCharacter).noTrainText);
             return;
         }
 
@@ -236,12 +229,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
         if (complete) {
-            if(charaList.size() !=0){
-                textResult1.setText(replaceTrainStr(setTime));
-            }else {
-                textResult1.setText("次の" + setTime.getShuruiStr() + "電車は。" + setTime.hour + "時" + setTime.minute + "分");
-            }
+            textResult1.setText(replaceTrainStr(setTime));
         }else{
             setTime=firstShuruiTime(daiya);
             if(setTime==null) {
@@ -359,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
                     String noChecked = intent.getStringExtra("noChecked");
                     charaList.add(new Character(imageUri, name, normal, noTrain, noChecked));
                     selectedCharacter=charaList.size()-1;
-                    textResult1.setText("" + charaList.size() + name + charaImage.getHeight() + "," + charaImage.getWidth());
+                    searchTrainTime();
                     break;
 
                 case REQUEST_CHARA_SELECT:
@@ -373,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         } else if (resultCode == RESULT_CANCELED) {
-                textResult1.setText("操作がキャンセルされました");
+                toast("操作がキャンセルされました");
         }
 
     }

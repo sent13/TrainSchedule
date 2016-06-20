@@ -29,7 +29,7 @@ public class resizeImage {
 
             // もし、画像が大きかったら縮小して読み込む
             //  今回はimageSizeMaxの大きさに合わせる
-            int imageSizeMax = 300;
+            int imageSizeMax = 200;
             inputStream = activity.getContentResolver().openInputStream(uri);
             float imageScaleWidth = (float) imageOptions.outWidth / imageSizeMax;
             float imageScaleHeight = (float) imageOptions.outHeight / imageSizeMax;

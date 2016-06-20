@@ -2,32 +2,30 @@ package io.sent.trainschedule;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.InputStream;
-
-public class MakeCharacterActivity extends AppCompatActivity {
+public class MakeCharacterActivity extends AppCompatActivity implements View.OnKeyListener{
 
     private static final int REQUEST_CHOOSER=1000;
+
+    ScheduleApplication application;
 
     EditText charaNameEdit;
     ImageView charaImage;
@@ -38,6 +36,7 @@ public class MakeCharacterActivity extends AppCompatActivity {
     Button makeCharaButton;
     Button cancelButton;
 
+    private InputMethodManager inputMethodManager;
     private Uri m_uri;
     private Uri resultUri;
     private Bitmap bitmap;
@@ -46,6 +45,7 @@ public class MakeCharacterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.make_character);
+        application=(ScheduleApplication)this.getApplication();
         Toolbar toolbar = (Toolbar) findViewById(R.id.make_character_toolbar);
         setSupportActionBar(toolbar);
         findViews();
@@ -76,6 +76,7 @@ public class MakeCharacterActivity extends AppCompatActivity {
         charaSerifNormalEdit.setMaxLines(3);
         charaSerifNoTrainEdit.setMaxLines(2);
         charaSerifNoCheckedEdit.setMaxLines(2);
+        inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
         resultUri=Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
                 getResources().getResourcePackageName(R.drawable.unknown) + '/' +
@@ -95,13 +96,13 @@ public class MakeCharacterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (checkCharaMake()) {
-                    Intent intent = new Intent();
-                    intent.putExtra("imageUri", resultUri);
-                    intent.putExtra("name", charaNameEdit.getText().toString().trim());
-                    intent.putExtra("normal", charaSerifNormalEdit.getText().toString().trim());
-                    intent.putExtra("noTrain", charaSerifNoTrainEdit.getText().toString().trim());
-                    intent.putExtra("noChecked", charaSerifNoCheckedEdit.getText().toString().trim());
-                    setResult(RESULT_OK, intent);
+                    String name=charaNameEdit.getText().toString().trim();
+                    String normal=charaSerifNormalEdit.getText().toString().trim();
+                    String noTrain=charaSerifNoTrainEdit.getText().toString().trim();
+                    String noChecked=charaSerifNoCheckedEdit.getText().toString().trim();
+                    application.addCharacter(new Character(bitmap,name,normal,noTrain,noChecked));
+                    application.setSelectedCharacterIndex(application.getCharaListSize()-1);
+                    setResult(RESULT_OK);
                     finish();
                 }
             }
@@ -115,6 +116,36 @@ public class MakeCharacterActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        charaNameEdit.setOnKeyListener(this);
+        charaSerifNormalEdit.setOnKeyListener(this);
+        charaSerifNoTrainEdit.setOnKeyListener(this);
+        charaSerifNoCheckedEdit.setOnKeyListener(this);
+    }
+
+    //キーボードでエンターキーが押された時の処理
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if((event.getAction()==KeyEvent.ACTION_DOWN) && (keyCode==KeyEvent.KEYCODE_ENTER)){
+
+            switch(v.getId()){
+                case R.id.chara_name_edit:
+                    charaSerifNormalEdit.requestFocus();
+                    break;
+                case R.id.chara_serif_normal:
+                    charaSerifNoTrainEdit.requestFocus();
+                    break;
+                case R.id.chara_serif_no_train:
+                    charaSerifNoCheckedEdit.requestFocus();
+                    break;
+                case R.id.chara_serif_no_checked:
+                    inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(),
+                            InputMethodManager.RESULT_SHOWN);
+                    break;
+            }
+            return true;
+        }
+        return false;
     }
 
     private void selectGallery(){
@@ -168,20 +199,9 @@ public class MakeCharacterActivity extends AppCompatActivity {
                     new String[]{"image/jpeg"},
                     null
             );
-
-
         }
     }
 
-
-    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
-        ParcelFileDescriptor parcelFileDescriptor =
-                getContentResolver().openFileDescriptor(uri, "r");
-        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-        parcelFileDescriptor.close();
-        return image;
-    }
 
     //キャラクターを作成できる状態か判定しできないならエラーを表示
     private boolean checkCharaMake(){

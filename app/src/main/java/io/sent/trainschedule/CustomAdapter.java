@@ -40,7 +40,7 @@ public class CustomAdapter extends ArrayAdapter<CustomData>{
         ImageView imageView;
         imageView = (ImageView)convertView.findViewById(R.id.customImage);
 
-        Bitmap bitmap=resizeImage.resize((Activity)context,item.getImageUri());
+        Bitmap bitmap=item.getImageBitmap();
         imageView.setImageBitmap(bitmap);
 
         TextView textView;

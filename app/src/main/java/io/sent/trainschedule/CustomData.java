@@ -7,15 +7,15 @@ import android.net.Uri;
  * Created by sent13 on 16/06/11.
  */
 public class CustomData {
-    private Uri imageUri;
+    private Bitmap bitmap;
     private String textData_;
 
-    public void setImageUri(Uri uri) {
-        imageUri = uri;
+    public void setImageBitmap(Bitmap bitmap) {
+        this.bitmap=bitmap;
     }
 
-    public Uri getImageUri() {
-        return imageUri;
+    public Bitmap getImageBitmap() {
+        return bitmap;
     }
 
     public void setTextData(String text) {

@@ -2,11 +2,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="io.sent.trainschedule.MainActivity">
-    <item
-        android:id="@+id/makeTimetable"
-        android:orderInCategory="100"
-        android:title="@string/make_timetable"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/makeCharacter"
@@ -20,5 +15,34 @@
         android:title="@string/change_character"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/editCharacter"
+        android:orderInCategory="100"
+        android:title="@string/edit_character"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/deleteCharacter"
+        android:orderInCategory="100"
+        android:title="@string/delete_character"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/makeTimetable"
+        android:orderInCategory="100"
+        android:title="@string/make_timetable"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/editTimetable"
+        android:orderInCategory="100"
+        android:title="@string/edit_timetable"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/deleteTimetable"
+        android:orderInCategory="100"
+        android:title="@string/delete_timetable"
+        app:showAsAction="never" />
 
 </menu>

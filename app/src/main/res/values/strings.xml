@@ -1,8 +1,14 @@
 <resources>
-    <string name="app_name">キャラクター時刻表</string>
+    <string name="app_name">キャラ時刻表</string>
+    
     <string name="make_timetable">時刻表を作成</string>
+    <string name="edit_timetable">時刻表を編集</string>
+    <string name="delete_timetable">時刻表を削除</string>
+
     <string name="make_character">キャラクターを作成</string>
-    <string name="change_character">キャラクターを変更</string>
+    <string name="edit_character">キャラクターを編集</string>
+    <string name="change_character">キャラクターを選択</string>
+    <string name="delete_character">キャラクターを削除</string>
     <string name="hour">時</string>
     <string name="minute">分</string>
 </resources>

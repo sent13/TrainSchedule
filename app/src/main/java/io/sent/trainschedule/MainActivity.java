@@ -3,7 +3,6 @@ package io.sent.trainschedule;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,31 +28,34 @@ public class MainActivity extends AppCompatActivity {
 
     private ScheduleApplication application;
 
-    TextView textView1;
-    TextView textView2;
-    NumberPicker numberPicker1;
-    NumberPicker numberPicker2;
-    TextView textResult1;
-    ImageView imageView1;
-    ImageView imageView2;
-    Calendar calendar;
-    Spinner spinner;
-    RadioGroup radioGroup;
-    RadioButton radioButton1;
-    RadioButton radioButton2;
-    CheckBox checkBox1;
-    CheckBox checkBox2;
-    CheckBox checkBox3;
-    ArrayAdapter<String> adapter;
-    Timetable timetable;
+    private TextView textView1;
+    private TextView textView2;
+    private NumberPicker numberPicker1;
+    private NumberPicker numberPicker2;
+    private TextView textResult1;
+    private ImageView imageView1;
+    private ImageView imageView2;
+    private Calendar calendar;
+    private Spinner spinner;
+    private RadioGroup radioGroup;
+    private RadioButton radioButton1;
+    private RadioButton radioButton2;
+    private CheckBox checkBox1;
+    private CheckBox checkBox2;
+    private CheckBox checkBox3;
+    private ArrayAdapter<String> adapter;
+    private Timetable timetable;
 
 
 
     static final int TRAIN_START_TIME=5;
     static final int TRAIN_FINISH_TIME=24;
     static final int REQUEST_CHARA_MAKE=1000;
+    static final int REQUEST_CHARA_EDIT=1010;
     static final int REQUEST_CHARA_SELECT=1020;
-    static final int REQUEST_TIMETABLE_SELECT=1040;
+    static final int REQUEST_CHARA_DELETE=1030;
+    static final int REQUEST_CHARA_EDIT_SET=1040;
+    static final int REQUEST_TIMETABLE_SELECT=1050;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy(){
-        super.onDestroy();
+    protected void onStop(){
+        super.onStop();
         application.saveCharaList();
     }
 
@@ -292,10 +294,24 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(this,"io.sent.trainschedule",
                             "io.sent.trainschedule.SelectCharacterActivity",REQUEST_CHARA_SELECT);
                     break;
+
                 case R.id.makeCharacter:
                     startActivityForResult(this, "io.sent.trainschedule",
                             "io.sent.trainschedule.MakeCharacterActivity",REQUEST_CHARA_MAKE);
                     break;
+
+                case R.id.editCharacter:
+                    startActivityForResult(this,"io.sent.trainschedule",
+                            "io.sent.trainschedule.SelectCharacterActivity",REQUEST_CHARA_EDIT);
+                    toast("編集したいキャラを選択してください");
+                    break;
+
+                case R.id.deleteCharacter:
+                    startActivityForResult(this,"io.sent.trainschedule",
+                            "io.sent.trainschedule.SelectCharacterActivity",REQUEST_CHARA_DELETE);
+                    toast("削除したいキャラを選択してください");
+                    break;
+
                 case R.id.makeTimetable:
                     startActivityForResult(this, "io.sent.trainschedule",
                             "io.sent.trainschedule.MakeTimetableActivity",REQUEST_TIMETABLE_SELECT);
@@ -316,6 +332,14 @@ public class MainActivity extends AppCompatActivity {
         activity.startActivityForResult(intent, requestCode);
     }
 
+    //アクティビティの起動(intentあり)
+    private static void startActivityForResult(Activity activity,String packageName,
+                                               String className,int requestCode,Intent intent) throws Exception{
+        intent.setComponent(new ComponentName(packageName, className));
+        intent.removeCategory(Intent.CATEGORY_DEFAULT);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     //アクティビティから返ってくる値を受け取る
     protected void onActivityResult(int requestCode, int resultCode, Intent intent){
         super.onActivityResult(requestCode, resultCode, intent);
@@ -329,8 +353,22 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case REQUEST_CHARA_SELECT:
+                    application.setSelectedCharacterIndex(intent.getIntExtra("index", 0));
                     imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
                     searchTrainTime();
+                    break;
+
+                case REQUEST_CHARA_EDIT:
+                    startCharaEdit(intent.getIntExtra("index", 0));
+                    break;
+
+                case REQUEST_CHARA_EDIT_SET:
+                    imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
+                    searchTrainTime();
+                    break;
+
+                case REQUEST_CHARA_DELETE:
+                    charaDelete(intent.getIntExtra("index",0));
                     break;
             }
 
@@ -341,9 +379,38 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //選択された番号からキャラ編集画面を開く
+    private void startCharaEdit(int editCharaIndex){
+        if(editCharaIndex==0){
+            toast("デフォルトキャラは編集出来ません。");
+            return;
+        }
+        Intent charaEditIntent=new Intent();
+        charaEditIntent.putExtra("editCharaIndex",editCharaIndex);
+        try {
+            startActivityForResult(this, "io.sent.trainschedule",
+                    "io.sent.trainschedule.MakeCharacterActivity", REQUEST_CHARA_EDIT_SET,charaEditIntent);
+        }catch (Exception e){
+            toast(e.getMessage());
+        }
+        return;
+    }
+
+    //キャラが削除可能かどうか
+    private void charaDelete(int position){
+        if(position==0){
+            toast("デフォルトキャラは削除出来ません。");
+            return;
+        }
+        application.deleteCharacter(position);
+        imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
+        searchTrainTime();
+        return;
+    }
+
 
     private void toast(String text){
         if(text==null) text="";
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }

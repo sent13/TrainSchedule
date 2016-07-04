@@ -32,7 +32,7 @@
 
         <activity
             android:name=".SelectCharacterActivity"
-            android:label="TrainSchedule"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

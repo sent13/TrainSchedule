@@ -69,6 +69,17 @@ public class ScheduleApplication extends Application{
         charaList.add(chara);
     }
 
+    public void setCharacter(int index,Character chara){
+        charaList.set(index,chara);
+    }
+
+    public void deleteCharacter(int index){
+        charaList.remove(index);
+        if(index<=selectedCharacterIndex){
+            selectedCharacterIndex--;
+        }
+    }
+
     public int getCharaListSize(){
         return charaList.size();
     }

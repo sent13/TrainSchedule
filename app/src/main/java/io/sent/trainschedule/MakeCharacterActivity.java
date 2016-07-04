@@ -1,10 +1,10 @@
 package io.sent.trainschedule;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -40,6 +40,7 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
     private Uri m_uri;
     private Uri resultUri;
     private Bitmap bitmap;
+    private int editCharaIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +53,6 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
         initViews();
     }
 
-    //アクションバーを作成
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
     private void findViews(){
         charaNameEdit=(EditText)findViewById(R.id.chara_name_edit);
         charaImage=(ImageView)findViewById(R.id.chara_image);
@@ -68,20 +62,34 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
         charaSerifNoCheckedEdit=(EditText)findViewById(R.id.chara_serif_no_checked);
         makeCharaButton=(Button)findViewById(R.id.make_chara_btn);
         cancelButton=(Button)findViewById(R.id.make_chara_cancel_btn);
+
+        inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     private void initViews(){
-        charaImage.setImageResource(R.drawable.unknown);
+        Intent intent=getIntent();
+        editCharaIndex=intent.getIntExtra("editCharaIndex", 0);
+
+        //キャラ編集をする場合（デフォルトキャラは編集できないので値は０以外）
+        if(editCharaIndex!=0){
+            Character editChara=application.getCharacter(editCharaIndex);
+            bitmap=editChara.charaImage;
+            charaImage.setImageBitmap(bitmap);
+            charaNameEdit.setText(editChara.name);
+            charaSerifNormalEdit.setText(editChara.normalText);
+            charaSerifNoTrainEdit.setText(editChara.noTrainText);
+            charaSerifNoCheckedEdit.setText(editChara.noCheckedText);
+        }else{
+            bitmap= BitmapFactory.decodeResource(getResources(),R.drawable.unknown);
+            charaImage.setImageResource(R.drawable.unknown);
+        }
         charaNameEdit.setMaxLines(1);
         charaSerifNormalEdit.setMaxLines(3);
         charaSerifNoTrainEdit.setMaxLines(2);
         charaSerifNoCheckedEdit.setMaxLines(2);
-        inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        resultUri=Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
-                getResources().getResourcePackageName(R.drawable.unknown) + '/' +
-                getResources().getResourceTypeName(R.drawable.unknown) + '/' +
-                getResources().getResourceEntryName(R.drawable.unknown) );
+
+
 
         //キャラの画像をギャラリーから選ぶ
         selectCharaImageBtn.setOnClickListener(new View.OnClickListener() {
@@ -100,8 +108,13 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
                     String normal=charaSerifNormalEdit.getText().toString().trim();
                     String noTrain=charaSerifNoTrainEdit.getText().toString().trim();
                     String noChecked=charaSerifNoCheckedEdit.getText().toString().trim();
-                    application.addCharacter(new Character(bitmap,name,normal,noTrain,noChecked));
-                    application.setSelectedCharacterIndex(application.getCharaListSize()-1);
+                    Character chara=new Character(bitmap, name, normal, noTrain, noChecked);
+                    if(editCharaIndex==0) {
+                        application.addCharacter(chara);
+                        application.setSelectedCharacterIndex(application.getCharaListSize() - 1);
+                    }else{
+                        application.setCharacter(editCharaIndex,chara);
+                    }
                     setResult(RESULT_OK);
                     finish();
                 }

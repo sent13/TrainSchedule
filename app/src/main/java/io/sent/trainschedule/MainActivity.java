@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBox1;
     private CheckBox checkBox2;
     private CheckBox checkBox3;
-    private ArrayAdapter<String> adapter;
     private Timetable timetable;
 
 
@@ -109,12 +108,8 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         imageView1.setImageResource(R.drawable.fukidasi);
         imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
-        adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter.add("長尾駅尼崎方面");
-        adapter.add("尼崎駅姫路方面");
-        adapter.add("余部駅姫路方面");
-        spinner.setAdapter(adapter);
+
+        spinner.setAdapter(application.adapter);
         radioButton1.setChecked(true);
         timetable=new Timetable();
         timetable.setEkimei("七面頰駅");
@@ -374,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         } else if (resultCode == RESULT_CANCELED) {
-                toast("操作がキャンセルされました");
+
         }
 
     }

@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -16,19 +17,21 @@ public class ScheduleApplication extends Application{
 
     private ArrayList<Character> charaList;
     private ArrayList<Timetable> timetableList;
+    public ArrayAdapter<String> adapter;
     private int selectedCharacterIndex=0;
 
     @Override
     public void onCreate(){
         super.onCreate();
+        adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         initViews();
 
     }
 
     private void initViews(){
         loadCharaList();
-        timetableList=new ArrayList<>();
-
+        loadTimetableList();
     }
 
     public ArrayList getCharaList(){
@@ -70,7 +73,7 @@ public class ScheduleApplication extends Application{
     }
 
     public void setCharacter(int index,Character chara){
-        charaList.set(index,chara);
+        charaList.set(index, chara);
     }
 
     public void deleteCharacter(int index){
@@ -90,6 +93,32 @@ public class ScheduleApplication extends Application{
 
     public Character getSelectCharacter(){
         return charaList.get(selectedCharacterIndex);
+    }
+
+    //時刻表のリストを読み出す
+    public void loadTimetableList(){
+        timetableList=(ArrayList)DataUtil.load(this, DataUtil.TIMETABLE_LIST_NAME);
+
+        if(timetableList==null){
+            timetableList=new ArrayList<>();
+            String ekimei="◯◯駅◯◯方面";
+            ArrayList<Time> heijituDaiya=new ArrayList<>();
+            ArrayList<Time> kyujituDaiya=new ArrayList<>();
+            timetableList.add(new Timetable(ekimei,heijituDaiya,kyujituDaiya));
+            adapter.add(ekimei);
+        }else{
+            for(int i=0;i<timetableList.size();i++){
+                //平日ダイヤ・休日ダイヤの文字列からarrayListに復元する
+                Timetable t=timetableList.get(i);
+                t.conversionStringToTime();
+                adapter.add(timetableList.get(i).ekimei);
+            }
+        }
+    }
+
+    //時刻表を保存する
+    public void saveTimetableList(){
+        DataUtil.store(this, timetableList, DataUtil.TIMETABLE_LIST_NAME);
     }
 
     public void addTimetable(Timetable timetable){

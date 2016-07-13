@@ -29,4 +29,14 @@ public class Time {
         }
     }
 
+    public String getShortShuruiStr(){
+        if(shurui==SINKAISOKU){
+            return "新";
+        }else if(shurui==KAISOKU){
+            return "快";
+        }else{
+            return "普";
+        }
+    }
+
 }

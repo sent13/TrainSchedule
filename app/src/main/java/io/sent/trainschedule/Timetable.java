@@ -1,15 +1,19 @@
 package io.sent.trainschedule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
  * Created by sent13 on 16/05/29.
  */
-public class Timetable {
-    String ekimei;              //駅名方面を格納
-    ArrayList<Time> heijituDaiya;      //平日ダイヤの配列
-    ArrayList<Time> kyujituDaiya;      //休日ダイヤの配列
+public class Timetable implements Serializable{
+    String ekimei="";              //駅名方面を格納
+    String heijituDaiyaStr;
+    String kyujituDaiyaStr;
+
+    transient ArrayList<Time> heijituDaiya;      //平日ダイヤの配列
+    transient ArrayList<Time> kyujituDaiya;      //休日ダイヤの配列
 
     public static final int HEIJITU=1;
     public static final int KYUJITU=2;
@@ -19,17 +23,23 @@ public class Timetable {
         kyujituDaiya=new ArrayList<>();
     }
 
-    public void addTime(int daiya,Time time){           //時間を追加
-        if(daiya==HEIJITU){
-            searchTime(heijituDaiya,time);
-        }else if(daiya==KYUJITU){
-            searchTime(kyujituDaiya,time);
-        }
+    public Timetable(String ekimei,ArrayList<Time> heijituDaiya,ArrayList<Time> kyujituDaiya){
+        this.ekimei=ekimei;
+        this.heijituDaiya=heijituDaiya;
+        this.kyujituDaiya=kyujituDaiya;
     }
 
     //順番に並ぶように時間を挿入する
-    private void searchTime(ArrayList<Time> trainDaiya,Time time){
+    public void addTime(int daiya,Time time){
+        ArrayList<Time> trainDaiya;
+        if(daiya==HEIJITU){
+            trainDaiya=heijituDaiya;
+        }else{
+            trainDaiya=kyujituDaiya;
+        }
         Iterator iterator=trainDaiya.iterator();
+
+
         int index=0;
         boolean complete=false;
         while (iterator.hasNext()) {
@@ -48,6 +58,93 @@ public class Timetable {
             index++;
         }
         if(trainDaiya.size()==0 || complete==false) trainDaiya.add(time);
+    }
+
+    //受け取ったダイヤと時間と同じ時刻がないかどうか（あるならfalse)
+    public boolean isSameTimeCheck(int daiya,Time time){
+        ArrayList<Time> trainDaiya;
+        if(daiya==HEIJITU){
+            trainDaiya=heijituDaiya;
+        }else{
+            trainDaiya=kyujituDaiya;
+        }
+        Iterator iterator=trainDaiya.iterator();
+
+        boolean addAble=true;
+        while (iterator.hasNext()) {
+            Time hikakuTime = (Time) iterator.next();
+            if (time.hour == hikakuTime.hour) {      //時間と分が同じなら
+                if (time.minute==hikakuTime.minute) {
+                    addAble=false;
+                }
+            }
+        }
+        return addAble;
+    }
+
+    public boolean isSameTimeRemove(int daiya,Time time){
+        ArrayList<Time> trainDaiya;
+        int index=0;
+        if(daiya==HEIJITU){
+            trainDaiya=heijituDaiya;
+        }else{
+            trainDaiya=kyujituDaiya;
+        }
+        Iterator iterator=trainDaiya.iterator();
+
+        while (iterator.hasNext()) {
+            Time hikakuTime = (Time) iterator.next();
+            if (time.shurui==hikakuTime.shurui && time.hour == hikakuTime.hour && time.minute==hikakuTime.minute) {      //時間と分が同じなら
+                trainDaiya.remove(index);
+                return true;
+            }
+            index++;
+        }
+        return false;
+    }
+
+    //ArrayList<Time>を文字列に変換する
+    public void conversionTimeToString(){
+        Iterator heijituIterator=heijituDaiya.iterator();
+        StringBuffer heijituStrBuf=new StringBuffer();
+        StringBuffer kyujituStrBuf=new StringBuffer();
+
+        while(heijituIterator.hasNext()){
+            Time heijituTime=(Time)heijituIterator.next();
+            heijituStrBuf.append(heijituTime.shurui+":"+heijituTime.hour+":"+heijituTime.minute+",");
+        }
+
+        Iterator kyujituIterator=kyujituDaiya.iterator();
+        while(kyujituIterator.hasNext()){
+            Time kyujituTime=(Time)kyujituIterator.next();
+            kyujituStrBuf.append(kyujituTime.shurui+":"+kyujituTime.hour+":"+kyujituTime.minute+",");
+        }
+
+        heijituDaiyaStr=heijituStrBuf.toString();
+        kyujituDaiyaStr=kyujituStrBuf.toString();
+    }
+
+    //文字列からArrayList<Time>を復元する
+    public void conversionStringToTime(){
+        String [] heijituStr=heijituDaiyaStr.split(",");
+        String [] kyujituStr=kyujituDaiyaStr.split(",");
+
+        if(heijituDaiya==null){
+            heijituDaiya=new ArrayList<>();
+        }
+        if(kyujituDaiya==null){
+            kyujituDaiya=new ArrayList<>();
+        }
+
+        for(String s:heijituStr){
+            String[] temp=s.split(":");
+
+        }
+
+        for(String s:kyujituStr){
+            String[] temp=s.split(":");
+
+        }
     }
 
     public void setEkimei(String name){

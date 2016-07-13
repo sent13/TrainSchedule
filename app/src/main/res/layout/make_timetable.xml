@@ -30,8 +30,6 @@
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="io.sent.trainschedule.MakeTimetableActivity"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         tools:showIn="@layout/make_timetable">
 
 
@@ -48,18 +46,18 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/addTimeBtn"
+                android:id="@+id/addOrRemoveTimeBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="時刻を\n追加" />
+                android:text="時刻を追加\n・削除" />
 
             <Button
-                android:id="@+id/removeTimeBtn"
+                android:id="@+id/saveTimetableBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="時刻を\n削除" />
+                android:text="保存" />
 
             <Button
                 android:id="@+id/makeTimetableBtn"

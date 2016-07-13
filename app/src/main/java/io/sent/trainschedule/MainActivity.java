@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop(){
         super.onStop();
         application.saveCharaList();
+        application.saveTimetableList();
     }
 
     //ビューを見つける
@@ -112,17 +113,7 @@ public class MainActivity extends AppCompatActivity {
         spinner.setAdapter(application.adapter);
         radioButton1.setChecked(true);
         timetable=new Timetable();
-        timetable.setEkimei("七面頰駅");
-        timetable.addTime(Timetable.HEIJITU, new Time(Time.SINKAISOKU, 8, 5));
-        timetable.addTime(Timetable.HEIJITU, new Time(Time.SINKAISOKU, 8, 10));
-        timetable.addTime(Timetable.HEIJITU, new Time(Time.FUTUU, 8, 40));
-        timetable.addTime(Timetable.HEIJITU,new Time(1,9,7));
-        timetable.addTime(Timetable.HEIJITU, new Time(1, 9, 20));
-        timetable.addTime(Timetable.HEIJITU, new Time(1, 10, 20));
-        timetable.addTime(Timetable.HEIJITU, new Time(Time.FUTUU, 12, 50));
-        timetable.addTime(Timetable.HEIJITU, new Time(1, 12, 20));
-        timetable.addTime(Timetable.HEIJITU, new Time(1, 19, 10));
-        timetable.addTime(Timetable.HEIJITU, new Time(1, 2, 20));
+
 
         listenerSet();
 

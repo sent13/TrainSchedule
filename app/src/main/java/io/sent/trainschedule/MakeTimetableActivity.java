@@ -1,25 +1,37 @@
 package io.sent.trainschedule;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 public class MakeTimetableActivity extends AppCompatActivity {
 
+    private final int ADD_TIME=1;
+    private final int REMOVE_TIME=2;
     private final int MP=TableLayout.LayoutParams.MATCH_PARENT;
     private final int WC=TableLayout.LayoutParams.WRAP_CONTENT;
     private int ROW1_TITLE_WIDTH;
@@ -29,16 +41,23 @@ public class MakeTimetableActivity extends AppCompatActivity {
     private TextView rowText1Title;
 
     private EditText stationNameEdit;
-    private Button addTimeButton;
-    private Button removeTimeButton;
+    private Button addOrRemoveTimeButton;
+    private Button saveTimetableButton;
     private Button makeTimetableButton;
     private Button cancelTimetableButton;
+    private TableLayout tableLayout;
     private InputMethodManager inputMethodManager;
+    private AlertDialog.Builder alertDialogBuilder;
+    private LayoutInflater inflater;
+    private View layout;
+
+    private Timetable timetable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.make_timetable);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         application=(ScheduleApplication)this.getApplication();
         Toolbar toolbar = (Toolbar) findViewById(R.id.make_timetable_toolbar);
         setSupportActionBar(toolbar);
@@ -51,15 +70,21 @@ public class MakeTimetableActivity extends AppCompatActivity {
     private void findViews(){
         rowText1Title=(TextView)findViewById(R.id.rowtext1_title);
         stationNameEdit=(EditText)findViewById(R.id.stationNameEdit);
-        addTimeButton=(Button)findViewById(R.id.addTimeBtn);
-        removeTimeButton=(Button)findViewById(R.id.removeTimeBtn);
+        addOrRemoveTimeButton=(Button)findViewById(R.id.addOrRemoveTimeBtn);
+        saveTimetableButton=(Button)findViewById(R.id.saveTimetableBtn);
         makeTimetableButton=(Button)findViewById(R.id.makeTimetableBtn);
         cancelTimetableButton=(Button)findViewById(R.id.cancelTimetableBtn);
 
         inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        // カスタムビューを設定
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
+
     }
 
     private void initViews(){
+        timetable=new Timetable();
         Intent intent=getIntent();
 
 
@@ -80,12 +105,41 @@ public class MakeTimetableActivity extends AppCompatActivity {
         stationNameEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if((event.getAction()==KeyEvent.ACTION_DOWN) && (keyCode==KeyEvent.KEYCODE_ENTER)){
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(),
                             InputMethodManager.RESULT_SHOWN);
                     return true;
                 }
                 return false;
+            }
+        });
+
+        addOrRemoveTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeDialog();
+            }
+        });
+
+        saveTimetableButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name=stationNameEdit.getText().toString().trim();
+                if(name.equals("")){
+                    toast("駅名を入力してください");
+                }else{
+                    timetable.setEkimei(name);
+                    timetable.conversionTimeToString();
+                    application.addTimetable(timetable);
+                    application.saveTimetableList();
+                    toast("保存に成功しました");
+                }
+            }
+        });
+
+        makeTimetableButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
             }
         });
 
@@ -102,17 +156,17 @@ public class MakeTimetableActivity extends AppCompatActivity {
     }
 
     private void makeTimeTable(){
-        TableLayout tableLayout = (TableLayout)findViewById(R.id.tableLayout);
+        tableLayout = (TableLayout)findViewById(R.id.tableLayout);
 
-        for(int i=0; i<25; i++){
+        for(int i=0; i<24; i++){
             TableRow tableRow = (TableRow)getLayoutInflater().inflate(R.layout.table_row, null);
             TextView rowHour = (TextView)tableRow.findViewById(R.id.rowtext1);
             rowHour.setText("" + i);
             rowHour.setWidth(ROW1_TITLE_WIDTH);
             TextView rowHeijitu=(TextView)tableRow.findViewById(R.id.rowtext2);
-            rowHeijitu.setText("" + i + " " + (i + 1) + " " + (i + 2) + " " + (i + 3) + " " + (i + 4) + " " + (i + 5) + " " + (i + 6) + " " + (i + 7) + " " + (i + 8));
+            rowHeijitu.setText("");
             TextView rowKyujitu=(TextView)tableRow.findViewById(R.id.rowtext3);
-            rowKyujitu.setText("" + i + " " + (i + 1) + " " + (i + 2) + " " + (i + 3) + " " + (i + 4) + " " + (i + 5) + " アオ" + (i + 6));
+            rowKyujitu.setText("");
 
             if((i+1)%2 == 0){
                 int color = getResources().getColor(R.color.lightgrey);
@@ -124,5 +178,134 @@ public class MakeTimetableActivity extends AppCompatActivity {
             tableLayout.addView(tableRow, new TableLayout.LayoutParams(MP, WC));
         }
 
+    }
+
+    private void drawTimeTable(){
+
+        //行の数だけ繰り返す
+        for(int i=0;i<tableLayout.getChildCount();i++){
+            TableRow tableRow=(TableRow)tableLayout.getChildAt(i);
+            TextView rowHeijitu=(TextView)tableRow.findViewById(R.id.rowtext2);
+            TextView rowKyujitu=(TextView)tableRow.findViewById(R.id.rowtext3);
+
+            StringBuffer strHeijitu=new StringBuffer();
+            StringBuffer strKyujitu=new StringBuffer();
+
+            //平日ダイヤの数だけ繰り返す
+            for(int j=0;j<timetable.heijituDaiya.size();j++){
+                Time heijituTime=timetable.heijituDaiya.get(j);
+                if(i==heijituTime.hour){
+                    strHeijitu.append(heijituTime.getShortShuruiStr()
+                            +String.format("%02d  ",heijituTime.minute));
+                }
+            }
+
+            //休日ダイヤの数だけ繰り返す
+            for(int j=0;j<timetable.kyujituDaiya.size();j++){
+                Time kyujituTime=timetable.kyujituDaiya.get(j);
+                if(i==kyujituTime.hour){
+                    strKyujitu.append(kyujituTime.getShortShuruiStr()
+                            +String.format("%02d  ",kyujituTime.minute));
+                }
+            }
+
+            rowHeijitu.setText(strHeijitu);
+            rowKyujitu.setText(strKyujitu);
+
+        }
+
+    }
+
+    private void makeDialog(){
+        layout = inflater.inflate(R.layout.timetable_dialog, (ViewGroup)findViewById(R.id.time_layout_root));
+
+        Button dialogRemoveTimeBtn=(Button)layout.findViewById(R.id.dialogBtn1);
+        Button dialogAddTimeBtn=(Button)layout.findViewById(R.id.dialogBtn2);
+        final NumberPicker dialogNumPicker1=(NumberPicker)layout.findViewById(R.id.dialogNumberPicker1);
+        final NumberPicker dialogNumPicker2=(NumberPicker)layout.findViewById(R.id.dialogNumberPicker2);
+        final RadioButton  dialogDaiyaRadioBtn1=(RadioButton)layout.findViewById(R.id.timeDaiyaRadioBtn1);
+        final RadioButton  dialogShuruiRadioBtn1=(RadioButton)layout.findViewById(R.id.timeShuruiRadioBtn1);
+        final RadioButton  dialogShuruiRadioBtn2=(RadioButton)layout.findViewById(R.id.timeShuruiRadioBtn2);
+
+        dialogNumPicker1.setMinValue(0);
+        dialogNumPicker1.setMaxValue(23);
+        dialogNumPicker1.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
+        dialogNumPicker2.setMinValue(0);
+        dialogNumPicker2.setMaxValue(59);
+        dialogNumPicker2.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
+        dialogDaiyaRadioBtn1.setChecked(true);
+        dialogShuruiRadioBtn1.setChecked(true);
+
+        alertDialogBuilder.setTitle("時刻を追加・削除");
+        dialogRemoveTimeBtn.setText("削除");
+        dialogAddTimeBtn.setText("追加");
+        alertDialogBuilder.setView(layout);
+
+        alertDialogBuilder.setNeutralButton("戻る", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        dialogAddTimeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int hour = dialogNumPicker1.getValue();
+                int minute = dialogNumPicker2.getValue();
+                int daiya=getDaiya(dialogDaiyaRadioBtn1);
+                int shurui=getTimeShurui(dialogShuruiRadioBtn1, dialogShuruiRadioBtn2);
+                Time time = new Time(shurui, hour, minute);
+                if (timetable.isSameTimeCheck(daiya, time)) {
+                    timetable.addTime(daiya, time);
+                    toast(hour+"時"+minute+"分を追加");
+                } else {
+                    toast("既に同じ時刻が追加されています");
+                }
+                drawTimeTable();
+            }
+        });
+
+        dialogRemoveTimeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int hour = dialogNumPicker1.getValue();
+                int minute = dialogNumPicker2.getValue();
+                int daiya=getDaiya(dialogDaiyaRadioBtn1);
+                int shurui=getTimeShurui(dialogShuruiRadioBtn1, dialogShuruiRadioBtn2);
+                Time time = new Time(shurui, hour, minute);
+                if(timetable.isSameTimeRemove(daiya,time)){
+                    toast(hour+"時"+minute+"分を削除");
+                }else{
+                    toast("削除する時刻がありません");
+                }
+                drawTimeTable();
+            }
+        });
+
+        // 表示
+        alertDialogBuilder.create().show();
+
+    }
+
+    private int getDaiya(RadioButton dialogDaiyaRadioBtn1){
+        if (dialogDaiyaRadioBtn1.isChecked()) {
+            return Timetable.HEIJITU;
+        } else {
+            return Timetable.KYUJITU;
+        }
+    }
+
+    private int getTimeShurui(RadioButton dialogShuruiRadioBtn1,RadioButton dialogShuruiRadioBtn2){
+        if (dialogShuruiRadioBtn1.isChecked()) {
+            return Time.SINKAISOKU;
+        } else if (dialogShuruiRadioBtn2.isChecked()) {
+            return Time.KAISOKU;
+        } else {
+            return Time.FUTUU;
+        }
+    }
+
+    private void toast(String text){
+        if(text==null) text="";
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }

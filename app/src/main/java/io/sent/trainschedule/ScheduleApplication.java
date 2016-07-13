@@ -109,8 +109,7 @@ public class ScheduleApplication extends Application{
         }else{
             for(int i=0;i<timetableList.size();i++){
                 //平日ダイヤ・休日ダイヤの文字列からarrayListに復元する
-                Timetable t=timetableList.get(i);
-                t.conversionStringToTime();
+                timetableList.get(i).conversionStringToTime();
                 adapter.add(timetableList.get(i).ekimei);
             }
         }

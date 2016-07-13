@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                toast(application.getTimetable(0).heijituDaiyaStr);
                 searchTrainTime();
             }
         });
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         checkBox1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                toast(application.getTimetable(1).heijituDaiyaStr);
                 searchTrainTime();
             }
         });

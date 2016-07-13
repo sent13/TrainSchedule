@@ -8,7 +8,7 @@ import java.util.Iterator;
  * Created by sent13 on 16/05/29.
  */
 public class Timetable implements Serializable{
-    String ekimei="";              //駅名方面を格納
+    String ekimei;              //駅名方面を格納
     String heijituDaiyaStr;
     String kyujituDaiyaStr;
 
@@ -21,12 +21,16 @@ public class Timetable implements Serializable{
     public Timetable(){
         heijituDaiya=new ArrayList<>();
         kyujituDaiya=new ArrayList<>();
+        heijituDaiyaStr="";
+        kyujituDaiyaStr="";
     }
 
     public Timetable(String ekimei,ArrayList<Time> heijituDaiya,ArrayList<Time> kyujituDaiya){
         this.ekimei=ekimei;
         this.heijituDaiya=heijituDaiya;
         this.kyujituDaiya=kyujituDaiya;
+        heijituDaiyaStr="";
+        kyujituDaiyaStr="";
     }
 
     //順番に並ぶように時間を挿入する
@@ -105,10 +109,10 @@ public class Timetable implements Serializable{
 
     //ArrayList<Time>を文字列に変換する
     public void conversionTimeToString(){
-        Iterator heijituIterator=heijituDaiya.iterator();
         StringBuffer heijituStrBuf=new StringBuffer();
         StringBuffer kyujituStrBuf=new StringBuffer();
 
+        Iterator heijituIterator=heijituDaiya.iterator();
         while(heijituIterator.hasNext()){
             Time heijituTime=(Time)heijituIterator.next();
             heijituStrBuf.append(heijituTime.shurui+":"+heijituTime.hour+":"+heijituTime.minute+",");
@@ -126,9 +130,6 @@ public class Timetable implements Serializable{
 
     //文字列からArrayList<Time>を復元する
     public void conversionStringToTime(){
-        String [] heijituStr=heijituDaiyaStr.split(",");
-        String [] kyujituStr=kyujituDaiyaStr.split(",");
-
         if(heijituDaiya==null){
             heijituDaiya=new ArrayList<>();
         }
@@ -136,14 +137,24 @@ public class Timetable implements Serializable{
             kyujituDaiya=new ArrayList<>();
         }
 
-        for(String s:heijituStr){
-            String[] temp=s.split(":");
-
+        //ダイヤを表す文字列が空でないならTimeを作り出す
+        if(!heijituDaiyaStr.equals("")) {
+            String [] heijituStr=heijituDaiyaStr.split(",");
+            for (String s : heijituStr) {
+                String[] temp = s.split(":");
+                heijituDaiya.add(new Time(Integer.parseInt(temp[0]),Integer.parseInt(temp[1]),
+                        Integer.parseInt(temp[2])));
+            }
         }
 
-        for(String s:kyujituStr){
-            String[] temp=s.split(":");
+        if(!kyujituDaiyaStr.equals("")) {
+            String [] kyujituStr=kyujituDaiyaStr.split(",");
+            for (String s : kyujituStr) {
+                String[] temp = s.split(":");
+                heijituDaiya.add(new Time(Integer.parseInt(temp[0]),Integer.parseInt(temp[1]),
+                        Integer.parseInt(temp[2])));
 
+            }
         }
     }
 

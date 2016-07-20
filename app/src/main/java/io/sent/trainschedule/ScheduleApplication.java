@@ -19,6 +19,7 @@ public class ScheduleApplication extends Application{
     private ArrayList<Timetable> timetableList;
     public ArrayAdapter<String> adapter;
     private int selectedCharacterIndex=0;
+    private int selectedTimetableIndex=0;
 
     @Override
     public void onCreate(){
@@ -98,6 +99,8 @@ public class ScheduleApplication extends Application{
     //時刻表のリストを読み出す
     public void loadTimetableList(){
         timetableList=(ArrayList)DataUtil.load(this, DataUtil.TIMETABLE_LIST_NAME);
+        Object object=DataUtil.load(this, DataUtil.TIMETABLE_SELECTED_NUM_NAME);
+        if(object!=null) selectedTimetableIndex=(int)object;
 
         if(timetableList==null){
             timetableList=new ArrayList<>();
@@ -115,25 +118,62 @@ public class ScheduleApplication extends Application{
         }
     }
 
-    //時刻表を保存する
+    public void uploadAdapter(){
+        adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        for(int i=0;i<timetableList.size();i++){
+            adapter.add(timetableList.get(i).ekimei);
+        }
+    }
+
+    //時刻表と時刻表が選択されている番号を保存する
     public void saveTimetableList(){
         DataUtil.store(this, timetableList, DataUtil.TIMETABLE_LIST_NAME);
+        DataUtil.store(this, selectedTimetableIndex, DataUtil.TIMETABLE_SELECTED_NUM_NAME);
     }
 
     public void addTimetable(Timetable timetable){
         timetableList.add(timetable);
     }
 
+    public void replaceTimetable(int index,Timetable timetable){
+        timetableList.set(index,timetable);
+    }
+
+    public void deleteTimetable(int index){
+        timetableList.remove(index);
+        if(index==0 && selectedTimetableIndex==0) {
+            return;
+        }else if(index <= selectedTimetableIndex){
+            selectedTimetableIndex--;
+        }
+    }
+
+    public int getTimetableListSize(){
+        return timetableList.size();
+    }
+
+
     public Timetable getTimetable(int index){
         return timetableList.get(index);
     }
+
+    public Timetable getSelectTimetable(){ return timetableList.get(selectedTimetableIndex);}
 
     public int getSelectedCharacterIndex(){
         return selectedCharacterIndex;
     }
 
+    public int getSelectedTimetableIndex(){
+        return selectedTimetableIndex;
+    }
+
     public void setSelectedCharacterIndex(int index){
         selectedCharacterIndex=index;
+    }
+
+    public void setSelectedTimetableIndex(int index){
+        selectedTimetableIndex=index;
     }
 }
 

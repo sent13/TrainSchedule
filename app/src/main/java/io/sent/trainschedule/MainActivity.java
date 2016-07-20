@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -47,14 +49,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    static final int TRAIN_START_TIME=5;
-    static final int TRAIN_FINISH_TIME=24;
+    static final int TRAIN_START_TIME=0;
+    static final int TRAIN_FINISH_TIME=23;
     static final int REQUEST_CHARA_MAKE=1000;
     static final int REQUEST_CHARA_EDIT=1010;
     static final int REQUEST_CHARA_SELECT=1020;
     static final int REQUEST_CHARA_DELETE=1030;
     static final int REQUEST_CHARA_EDIT_SET=1040;
-    static final int REQUEST_TIMETABLE_SELECT=1050;
+    static final int REQUEST_TIMETABLE_MAKE=1050;
+    static final int REQUEST_TIMETABLE_EDIT=1060;
+    static final int REQUEST_TIMETABLE_DELETE=1070;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,9 +114,11 @@ public class MainActivity extends AppCompatActivity {
         imageView1.setImageResource(R.drawable.fukidasi);
         imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
 
+        application.uploadAdapter();
         spinner.setAdapter(application.adapter);
+        spinner.setSelection(application.getSelectedTimetableIndex());
         radioButton1.setChecked(true);
-        timetable=new Timetable();
+        timetable=application.getSelectTimetable();
 
 
         listenerSet();
@@ -126,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                toast(application.getTimetable(0).heijituDaiyaStr);
                 searchTrainTime();
             }
         });
@@ -148,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
         checkBox1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                toast(application.getTimetable(1).heijituDaiyaStr);
                 searchTrainTime();
             }
         });
@@ -166,11 +170,26 @@ public class MainActivity extends AppCompatActivity {
                 searchTrainTime();
             }
         });
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                application.setSelectedTimetableIndex(position);
+                searchTrainTime();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void searchTrainTime(){
         int hour =numberPicker1.getValue();
         int minute=numberPicker2.getValue();
+
+        timetable=application.getSelectTimetable();
 
         ArrayList<Time> daiya;
 
@@ -278,14 +297,14 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             switch (id) {
-                case R.id.changeCharacter:
-                    startActivityForResult(this,"io.sent.trainschedule",
-                            "io.sent.trainschedule.SelectCharacterActivity",REQUEST_CHARA_SELECT);
-                    break;
-
                 case R.id.makeCharacter:
                     startActivityForResult(this, "io.sent.trainschedule",
                             "io.sent.trainschedule.MakeCharacterActivity",REQUEST_CHARA_MAKE);
+                    break;
+
+                case R.id.changeCharacter:
+                    startActivityForResult(this,"io.sent.trainschedule",
+                            "io.sent.trainschedule.SelectCharacterActivity",REQUEST_CHARA_SELECT);
                     break;
 
                 case R.id.editCharacter:
@@ -302,7 +321,19 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.makeTimetable:
                     startActivityForResult(this, "io.sent.trainschedule",
-                            "io.sent.trainschedule.MakeTimetableActivity",REQUEST_TIMETABLE_SELECT);
+                            "io.sent.trainschedule.MakeTimetableActivity", REQUEST_TIMETABLE_MAKE);
+                    break;
+
+                case R.id.editTimetable:
+                    startActivityForResult(this,"io.sent.trainschedule",
+                            "io.sent.trainschedule.SelectTimetableActivity",REQUEST_TIMETABLE_EDIT);
+                    toast("編集したい時刻表を選択してください");
+                    break;
+
+                case R.id.deleteTimetable:
+                    startActivityForResult(this,"io.sent.trainschedule",
+                            "io.sent.trainschedule.SelectTimetableActivity",REQUEST_TIMETABLE_DELETE);
+                    toast("削除したい時刻表を選択してください");
                     break;
             }
         }catch(Exception e){
@@ -357,12 +388,37 @@ public class MainActivity extends AppCompatActivity {
 
                 case REQUEST_CHARA_DELETE:
                     charaDelete(intent.getIntExtra("index",0));
+                    searchTrainTime();
+                    break;
+
+                case REQUEST_TIMETABLE_MAKE:
+                    application.uploadAdapter();
+                    spinner.setAdapter(application.adapter);
+                    spinner.setSelection(application.getSelectedTimetableIndex());
+                    searchTrainTime();
+                    break;
+
+                case REQUEST_TIMETABLE_EDIT:
+                    startTimetableEdit(intent.getIntExtra("index",-1));
+                    break;
+
+                case REQUEST_TIMETABLE_DELETE:
+                    timetableDelete(intent.getIntExtra("index",-1));
+                    application.uploadAdapter();
+                    spinner.setAdapter(application.adapter);
+                    spinner.setSelection(application.getSelectedTimetableIndex());
+                    searchTrainTime();
                     break;
             }
 
 
         } else if (resultCode == RESULT_CANCELED) {
-
+            if(requestCode ==REQUEST_TIMETABLE_MAKE){
+                application.uploadAdapter();
+                spinner.setAdapter(application.adapter);
+                spinner.setSelection(application.getSelectedTimetableIndex());
+                searchTrainTime();
+            }
         }
 
     }
@@ -370,11 +426,11 @@ public class MainActivity extends AppCompatActivity {
     //選択された番号からキャラ編集画面を開く
     private void startCharaEdit(int editCharaIndex){
         if(editCharaIndex==0){
-            toast("デフォルトキャラは編集出来ません。");
+            toast("デフォルトキャラは編集出来ません");
             return;
         }
         Intent charaEditIntent=new Intent();
-        charaEditIntent.putExtra("editCharaIndex",editCharaIndex);
+        charaEditIntent.putExtra("editCharaIndex", editCharaIndex);
         try {
             startActivityForResult(this, "io.sent.trainschedule",
                     "io.sent.trainschedule.MakeCharacterActivity", REQUEST_CHARA_EDIT_SET,charaEditIntent);
@@ -384,15 +440,38 @@ public class MainActivity extends AppCompatActivity {
         return;
     }
 
+    //選択された番号から時刻表編集画面を開く
+    private void startTimetableEdit(int editTimetableIndex){
+        if(editTimetableIndex==-1) return;
+
+        Intent timetableEditIntent=new Intent();
+        timetableEditIntent.putExtra("editTimetableIndex", editTimetableIndex);
+        try {
+            startActivityForResult(this, "io.sent.trainschedule",
+                    "io.sent.trainschedule.MakeTimetableActivity", REQUEST_TIMETABLE_MAKE,timetableEditIntent);
+        }catch (Exception e){
+            toast(e.getMessage());
+        }
+        return;
+    }
+
+    //時刻表が削除可能かどうか
+    private void timetableDelete(int position){
+        if(application.getTimetableListSize()==1 ||position==-1){
+            toast("時刻表はこれ以上削除出来ません");
+            return;
+        }
+        application.deleteTimetable(position);
+        return;
+    }
+
     //キャラが削除可能かどうか
     private void charaDelete(int position){
         if(position==0){
-            toast("デフォルトキャラは削除出来ません。");
+            toast("デフォルトキャラは削除出来ません");
             return;
         }
         application.deleteCharacter(position);
-        imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
-        searchTrainTime();
         return;
     }
 

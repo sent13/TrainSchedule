@@ -19,6 +19,7 @@ public class DataUtil {
     public final static String CHARA_LIST_NAME = "charaList.obj";
     public final static String CHARA_SELECTED_NUM_NAME="selectedChara.obj";
     public final static String TIMETABLE_LIST_NAME="timetableList.obj";
+    public final static String TIMETABLE_SELECTED_NUM_NAME="selectedTimetable.obj";
 
     /**
      * データを保存する

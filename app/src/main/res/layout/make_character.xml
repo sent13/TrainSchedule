@@ -31,8 +31,7 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
         android:orientation="vertical"
         android:gravity="center_horizontal"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="io.sent.trainschedule.MakeCharacterActivity"
-        tools:showIn="@layout/make_character">
+        tools:context="io.sent.trainschedule.MakeCharacterActivity">
 
 
 

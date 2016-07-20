@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="io.sent.trainschedule.SelectCharacterActivity">
+    tools:context="io.sent.trainschedule.SelectTimetableActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/select_character_toolbar"
+            android:id="@+id/select_timetable_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -31,13 +31,13 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="io.sent.trainschedule.SelectCharacterActivity">
+        tools:context="io.sent.trainschedule.SelectTimetableActivity">
 
         <ListView
-            android:id="@+id/characterListView"
+            android:id="@+id/timetableListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></ListView>
 
-        </LinearLayout>
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

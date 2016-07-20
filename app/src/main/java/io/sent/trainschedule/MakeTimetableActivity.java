@@ -52,6 +52,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
     private View layout;
 
     private Timetable timetable;
+    private int editNumber;             //時刻表を上書き、もしくは書き込む場所の番号
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +85,15 @@ public class MakeTimetableActivity extends AppCompatActivity {
     }
 
     private void initViews(){
-        timetable=new Timetable();
-        Intent intent=getIntent();
+        final Intent intent=getIntent();
+        editNumber=intent.getIntExtra("editTimetableIndex",application.getTimetableListSize());
+
+        if(editNumber==application.getTimetableListSize()){
+            timetable=new Timetable();
+        }else{
+            timetable=application.getTimetable(editNumber);
+            stationNameEdit.setText(timetable.ekimei);
+        }
 
 
         ViewTreeObserver observer = rowText1Title.getViewTreeObserver();
@@ -124,22 +132,17 @@ public class MakeTimetableActivity extends AppCompatActivity {
         saveTimetableButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name=stationNameEdit.getText().toString().trim();
-                if(name.equals("")){
-                    toast("駅名を入力してください");
-                }else{
-                    timetable.setEkimei(name);
-                    timetable.conversionTimeToString();
-                    application.addTimetable(timetable);
-                    application.saveTimetableList();
-                    toast("保存に成功しました");
-                }
+               saveTimetable();
             }
         });
 
         makeTimetableButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(saveTimetable()) {
+                    setResult(RESULT_OK);
+                    finish();
+                }
             }
         });
 
@@ -155,6 +158,26 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
     }
 
+    private boolean saveTimetable(){
+        String name=stationNameEdit.getText().toString().trim();
+        if(name.equals("")){
+            toast("駅名を入力してください");
+            return false;
+        }else{
+            timetable.setEkimei(name);
+            timetable.conversionTimeToString();
+            if(editNumber==application.getTimetableListSize()) {
+                application.addTimetable(timetable);
+                application.saveTimetableList();
+                toast("保存に成功しました");
+            }else{
+                application.replaceTimetable(editNumber,timetable);
+                application.saveTimetableList();
+                toast("上書き保存に成功しました");
+            }
+            return true;
+        }
+    }
     private void makeTimeTable(){
         tableLayout = (TableLayout)findViewById(R.id.tableLayout);
 
@@ -177,7 +200,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
             tableLayout.addView(tableRow, new TableLayout.LayoutParams(MP, WC));
         }
-
+        drawTimeTable();
     }
 
     private void drawTimeTable(){

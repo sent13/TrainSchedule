@@ -17,14 +17,14 @@ public class ScheduleApplication extends Application{
 
     private ArrayList<Character> charaList;
     private ArrayList<Timetable> timetableList;
-    public ArrayAdapter<String> adapter;
+    public ArrayAdapter<String> adapter;         //駅名のSpinnerようのアダプタ
     private int selectedCharacterIndex=0;
     private int selectedTimetableIndex=0;
 
     @Override
     public void onCreate(){
         super.onCreate();
-        adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        adapter=new EkimeiAdapter(this,android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         initViews();
 
@@ -119,7 +119,7 @@ public class ScheduleApplication extends Application{
     }
 
     public void uploadAdapter(){
-        adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        adapter=new EkimeiAdapter(this, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         for(int i=0;i<timetableList.size();i++){
             adapter.add(timetableList.get(i).ekimei);

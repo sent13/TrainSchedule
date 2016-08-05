@@ -3,12 +3,15 @@ package io.sent.trainschedule;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -111,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         numberPicker2.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
         calendar=Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        imageView1.setImageResource(R.drawable.fukidasi);
         imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
 
         application.uploadAdapter();
@@ -119,12 +121,23 @@ public class MainActivity extends AppCompatActivity {
         spinner.setSelection(application.getSelectedTimetableIndex());
         radioButton1.setChecked(true);
         timetable=application.getSelectTimetable();
-
-
-        listenerSet();
-
         pickerTimeSet();
-        searchTrainTime();
+
+        ViewTreeObserver observer=imageView1.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                listenerSet();
+                searchTrainTime();
+                if (Build.VERSION.SDK_INT >= 16) {
+                    imageView1.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    imageView1.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+            }
+        });
+
+
     }
 
     private void listenerSet(){
@@ -203,10 +216,10 @@ public class MainActivity extends AppCompatActivity {
         Iterator iterator=daiya.iterator();
 
         if(!checkBox1.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked()){
-            textResult1.setText(application.getSelectCharacter().noCheckedText);
+            textResult1.setText(insertKaigyouCode(application.getSelectCharacter().noCheckedText));
             return;
         }else if (daiya.size() == 0) {
-            textResult1.setText(application.getSelectCharacter().noTrainText);
+            textResult1.setText(insertKaigyouCode(application.getSelectCharacter().noTrainText));
             return;
         }
 
@@ -229,13 +242,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (complete) {
-            textResult1.setText(replaceTrainStr(setTime));
+            textResult1.setText(insertKaigyouCode(replaceTrainStr(setTime)));
         }else{
             setTime=firstShuruiTime(daiya);
             if(setTime==null) {
-                textResult1.setText(application.getSelectCharacter().noTrainText);
+                textResult1.setText(insertKaigyouCode(application.getSelectCharacter().noTrainText));
             }else{
-                textResult1.setText(replaceTrainStr(setTime));
+                textResult1.setText(insertKaigyouCode(replaceTrainStr(setTime)));
             }
         }
 
@@ -247,6 +260,22 @@ public class MainActivity extends AppCompatActivity {
         str=str.replaceAll("shurui",time.getShuruiStr());
         str=str.replaceAll("time",time.hour+"時"+time.minute+"分");
         return str;
+    }
+
+    //文字列を受け取り適切な位置で改行した文字列を返す
+    private String insertKaigyouCode(String str){
+        StringBuffer stringBuffer=new StringBuffer(str);
+        int fukidasiWidth=imageView1.getWidth();
+        int mojiWidth=(int)textResult1.getTextSize();
+        int gyouMojisuu=fukidasiWidth/mojiWidth-2;
+
+        toast("吹き出し "+fukidasiWidth+"　文字幅 "+mojiWidth+" 行文字数 "+gyouMojisuu+" 高さ "+imageView1.getHeight());
+
+        for(int i=gyouMojisuu;i<stringBuffer.length();i=i+gyouMojisuu){
+            stringBuffer.insert(i++,"\n");
+        }
+
+        return stringBuffer.toString();
     }
 
     //種類を受け取りチェックボックスにその種類のチェックが入っているか返す

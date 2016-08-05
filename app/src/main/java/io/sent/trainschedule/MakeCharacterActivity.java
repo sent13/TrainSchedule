@@ -246,6 +246,11 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
             msg=msg.concat("チェックが入っていない場合が未入力です");
             flag=false;
         }
+        if(name.length()>=50 || normal.length()>=50 || noTrain.length()>=50 || noCheckd.length()>=50){
+            if(!msg.equals("")) msg=msg.concat("\n");
+            msg=msg.concat("文字数が50を超えている項目があります");
+            flag=false;
+        }
 
 
         if(flag==false){

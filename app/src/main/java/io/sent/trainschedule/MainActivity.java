@@ -269,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
         int mojiWidth=(int)textResult1.getTextSize();
         int gyouMojisuu=fukidasiWidth/mojiWidth-2;
 
-        toast("吹き出し "+fukidasiWidth+"　文字幅 "+mojiWidth+" 行文字数 "+gyouMojisuu+" 高さ "+imageView1.getHeight());
 
         for(int i=gyouMojisuu;i<stringBuffer.length();i=i+gyouMojisuu){
             stringBuffer.insert(i++,"\n");
@@ -417,6 +416,7 @@ public class MainActivity extends AppCompatActivity {
 
                 case REQUEST_CHARA_DELETE:
                     charaDelete(intent.getIntExtra("index",0));
+                    imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
                     searchTrainTime();
                     break;
 

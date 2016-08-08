@@ -39,35 +39,40 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
             android:id="@+id/chara_name_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:hint="キャラクター名" />
 
         <ImageView
             android:id="@+id/chara_image"
             android:layout_width="match_parent"
-            android:layout_height="150dp" />
+            android:layout_height="@dimen/image_width" />
 
         <Button
             android:id="@+id/select_chara_imagebtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:text="画像を選択"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="通常の案内"/>
+            android:textSize="@dimen/text_size"
+            android:text="通常の案内(shurui:種類 time:時刻)"/>
 
         <EditText
             android:id="@+id/chara_serif_normal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
+            android:textSize="@dimen/text_size"
             android:background="@drawable/frame"
             android:lines="3" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:text="次の時間の電車がない場合の案内"/>
 
         <EditText
@@ -76,11 +81,13 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
             android:layout_height="wrap_content"
             android:lines="2"
             android:layout_margin="5dp"
+            android:textSize="@dimen/text_size"
             android:background="@drawable/frame" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:text="チェックが入っていない場合の案内"/>
 
         <EditText
@@ -89,6 +96,7 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
             android:layout_height="wrap_content"
             android:lines="2"
             android:layout_margin="5dp"
+            android:textSize="@dimen/text_size"
             android:background="@drawable/frame" />
 
         <LinearLayout
@@ -100,12 +108,14 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="40dp"
+                android:textSize="@dimen/text_size"
                 android:text="作成"/>
 
             <Button
                 android:id="@+id/make_chara_cancel_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
                 android:text="キャンセル"/>
         </LinearLayout>
 

@@ -3,4 +3,11 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="fukidasi_serif">16dp</dimen>
+    <dimen name="image_width">150dp</dimen>
+    <dimen name="text_size">15dp</dimen>
+    <dimen name="list_image_width">65dp</dimen>
+    <dimen name="timetable_text_size">12dp</dimen>
+    <dimen name="timetable_title_size">20dp</dimen>
 </resources>

@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="16dp"
+            android:textSize="@dimen/fukidasi_serif"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="8dp"
             android:singleLine="false" />
@@ -36,7 +36,7 @@
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="@dimen/image_width"
         android:layout_gravity="center"/>
 
 
@@ -59,12 +59,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="平日"
+            android:textSize="@dimen/text_size"
             android:layout_marginRight="30dp"/>
 
         <RadioButton
             android:id="@+id/radioButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:text="休日"/>
     </RadioGroup>
 
@@ -89,6 +91,7 @@
                 android:text="新快速"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
                 android:layout_marginBottom="20dp"
                 />
 
@@ -97,11 +100,13 @@
                 android:text="快速"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
                 android:layout_marginBottom="20dp"/>
 
             <CheckBox
                 android:id="@+id/checkBox3"
                 android:text="普通"
+                android:textSize="@dimen/text_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

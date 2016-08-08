@@ -36,6 +36,7 @@
             android:id="@+id/stationNameEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:hint="駅名・方面" />
 
         <LinearLayout
@@ -49,6 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:textSize="@dimen/timetable_text_size"
                 android:text="時刻を追加\n・削除" />
 
             <Button
@@ -56,6 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:textSize="@dimen/timetable_text_size"
                 android:text="保存" />
 
             <Button
@@ -63,6 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:textSize="@dimen/timetable_text_size"
                 android:text="作成" />
 
             <Button
@@ -70,6 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:textSize="@dimen/timetable_text_size"
                 android:text="キャン\nセル" />
 
         </LinearLayout>
@@ -101,7 +106,7 @@
                         android:paddingTop="2dp"
                         android:text="時"
                         android:textColor="@color/white"
-                        android:textSize="20dp" />
+                        android:textSize="@dimen/timetable_title_size" />
                 </LinearLayout>
 
                 <TextView
@@ -116,7 +121,7 @@
                     android:paddingTop="2dp"
                     android:text="平日"
                     android:textColor="@color/white"
-                    android:textSize="20dp" />
+                    android:textSize="@dimen/timetable_title_size" />
 
                 <TextView
                     android:id="@+id/rowtext3_title"
@@ -131,7 +136,7 @@
                     android:paddingTop="2dp"
                     android:text="休日"
                     android:textColor="@color/white"
-                    android:textSize="20dp" />
+                    android:textSize="@dimen/timetable_title_size" />
             </TableRow>
 
         </TableLayout>

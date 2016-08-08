@@ -17,12 +17,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="平日"
+            android:textSize="@dimen/text_size"
             android:layout_marginRight="30dp"/>
 
         <RadioButton
             android:id="@+id/timeDaiyaRadioBtn2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:text="休日"/>
     </RadioGroup>
 
@@ -47,6 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="新快速"
+                android:textSize="@dimen/text_size"
                 android:layout_marginBottom="20dp"
                 android:layout_marginRight="30dp"/>
 
@@ -55,12 +58,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:textSize="@dimen/text_size"
                 android:text="快速"/>
 
             <RadioButton
                 android:id="@+id/timeShuruiRadioBtn3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
                 android:text="普通"/>
         </RadioGroup>
 
@@ -109,12 +114,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ボタン"
+            android:textSize="@dimen/text_size"
             android:layout_marginRight="30dp" />
 
         <Button
             android:id="@+id/dialogBtn2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
             android:text="ボタン" />
 
     </LinearLayout>

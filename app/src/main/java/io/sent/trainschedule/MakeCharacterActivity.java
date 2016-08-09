@@ -3,6 +3,7 @@ package io.sent.trainschedule;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
@@ -21,9 +22,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.jar.Manifest;
+
 public class MakeCharacterActivity extends AppCompatActivity implements View.OnKeyListener{
 
     private static final int REQUEST_CHOOSER=1000;
+    private static int PERMISSION_REQUEST_CODE=1;
 
     ScheduleApplication application;
 
@@ -95,7 +99,20 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
         selectCharaImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectGallery();
+                //Android6.0以降ならパーミッションをチェックする
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                    //許可が下りているなら実行
+                    if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)==
+                            PackageManager.PERMISSION_GRANTED){
+                        selectGallery();
+                    }else{
+                        //許可がないなら許可を得る処理
+                        requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                                ,PERMISSION_REQUEST_CODE);
+                    }
+                }else {
+                    selectGallery();
+                }
             }
         });
 
@@ -134,6 +151,18 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
         charaSerifNormalEdit.setOnKeyListener(this);
         charaSerifNoTrainEdit.setOnKeyListener(this);
         charaSerifNoCheckedEdit.setOnKeyListener(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        if(PERMISSION_REQUEST_CODE == requestCode){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                //許可されたなら
+                selectGallery();
+            }else{
+                toast("許可がないので画像を選択できません");
+            }
+        }
     }
 
     //キーボードでエンターキーが押された時の処理

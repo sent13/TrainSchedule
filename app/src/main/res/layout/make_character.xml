@@ -16,8 +16,8 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
         android:id="@+id/make_character_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay" />
+        android:background="@color/main_color"
+        app:popupTheme="@style/Theme.AppCompat" />
 
 </android.support.design.widget.AppBarLayout>
 
@@ -66,7 +66,7 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/frame"
+            android:background="?attr/charaMakeEditorRef"
             android:lines="3" />
 
         <TextView
@@ -82,7 +82,7 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
             android:lines="2"
             android:layout_margin="5dp"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/frame" />
+            android:background="?charaMakeEditorRef" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -97,7 +97,7 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
             android:lines="2"
             android:layout_margin="5dp"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/frame" />
+            android:background="?attr/charaMakeEditorRef" />
 
         <LinearLayout
             android:layout_width="wrap_content"

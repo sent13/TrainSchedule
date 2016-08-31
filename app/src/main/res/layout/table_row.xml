@@ -12,29 +12,25 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="フィールド"
-        android:textSize="@dimen/text_size"
-        android:textColor="@color/black" />
+        android:textSize="@dimen/text_size" />
 
     <TextView
         android:id="@+id/rowtext2"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginLeft="1dp"
-        android:background="@color/white"
         android:paddingLeft="5dp"
         android:text="0"
         android:textSize="@dimen/text_size"
-        android:textColor="@color/black" />
+         />
 
     <TextView
         android:id="@+id/rowtext3"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginLeft="1dp"
-        android:background="@color/white"
         android:paddingLeft="5dp"
         android:text="0"
-        android:textSize="@dimen/text_size"
-        android:textColor="@color/black" />
+        android:textSize="@dimen/text_size" />
 
 </TableRow>

@@ -56,10 +56,11 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        application=(ScheduleApplication)this.getApplication();
+        if(application.getThemeNum()!=1) setTheme(R.style.NoActionBarThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.make_timetable);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        application=(ScheduleApplication)this.getApplication();
         Toolbar toolbar = (Toolbar) findViewById(R.id.make_timetable_toolbar);
         setSupportActionBar(toolbar);
 
@@ -191,11 +192,22 @@ public class MakeTimetableActivity extends AppCompatActivity {
             TextView rowKyujitu=(TextView)tableRow.findViewById(R.id.rowtext3);
             rowKyujitu.setText("");
 
+
             if((i+1)%2 == 0){
-                int color = getResources().getColor(R.color.lightgrey);
+                int color=getResources().getColor(R.color.lightgrey);
+                if(application.getThemeNum()!=1){
+                    color= getResources().getColor(R.color.black2);
+                }
                 rowHour.setBackgroundColor(color);
                 rowHeijitu.setBackgroundColor(color);
                 rowKyujitu.setBackgroundColor(color);
+            }else{
+                if(application.getThemeNum()!=1){
+                    int color= getResources().getColor(R.color.main_color);
+                    rowHour.setBackgroundColor(color);
+                    rowHeijitu.setBackgroundColor(color);
+                    rowKyujitu.setBackgroundColor(color);
+                }
             }
 
             tableLayout.addView(tableRow, new TableLayout.LayoutParams(MP, WC));
@@ -218,7 +230,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
             for(int j=0;j<timetable.heijituDaiya.size();j++){
                 Time heijituTime=timetable.heijituDaiya.get(j);
                 if(i==heijituTime.hour){
-                    strHeijitu.append(heijituTime.getShortShuruiStr()
+                    strHeijitu.append(application.getTrainShuruiStr(heijituTime.getShuruiNum())
                             +String.format("%02d  ",heijituTime.minute));
                 }
             }
@@ -227,7 +239,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
             for(int j=0;j<timetable.kyujituDaiya.size();j++){
                 Time kyujituTime=timetable.kyujituDaiya.get(j);
                 if(i==kyujituTime.hour){
-                    strKyujitu.append(kyujituTime.getShortShuruiStr()
+                    strKyujitu.append(application.getTrainShuruiStr(kyujituTime.getShuruiNum())
                             +String.format("%02d  ",kyujituTime.minute));
                 }
             }
@@ -249,6 +261,8 @@ public class MakeTimetableActivity extends AppCompatActivity {
         final RadioButton  dialogDaiyaRadioBtn1=(RadioButton)layout.findViewById(R.id.timeDaiyaRadioBtn1);
         final RadioButton  dialogShuruiRadioBtn1=(RadioButton)layout.findViewById(R.id.timeShuruiRadioBtn1);
         final RadioButton  dialogShuruiRadioBtn2=(RadioButton)layout.findViewById(R.id.timeShuruiRadioBtn2);
+        final RadioButton  dialogShuruiRadioBtn3=(RadioButton)layout.findViewById(R.id.timeShuruiRadioBtn3);
+
 
         dialogNumPicker1.setMinValue(0);
         dialogNumPicker1.setMaxValue(23);
@@ -258,6 +272,9 @@ public class MakeTimetableActivity extends AppCompatActivity {
         dialogNumPicker2.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
         dialogDaiyaRadioBtn1.setChecked(true);
         dialogShuruiRadioBtn1.setChecked(true);
+        dialogShuruiRadioBtn1.setText(application.getTrainShuruiStr(application.MOST_FAST_LONG));
+        dialogShuruiRadioBtn2.setText(application.getTrainShuruiStr(application.FAST_LONG));
+        dialogShuruiRadioBtn3.setText(application.getTrainShuruiStr(application.SLOW_LONG));
 
         alertDialogBuilder.setTitle("時刻を追加・削除");
         dialogRemoveTimeBtn.setText("削除");
@@ -279,7 +296,6 @@ public class MakeTimetableActivity extends AppCompatActivity {
                 Time time = new Time(shurui, hour, minute);
                 if (timetable.isSameTimeCheck(daiya, time)) {
                     timetable.addTime(daiya, time);
-                    toast(hour+"時"+minute+"分を追加");
                 } else {
                     toast("既に同じ時刻が追加されています");
                 }

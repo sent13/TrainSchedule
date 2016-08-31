@@ -20,6 +20,8 @@ public class DataUtil {
     public final static String CHARA_SELECTED_NUM_NAME="selectedChara.obj";
     public final static String TIMETABLE_LIST_NAME="timetableList.obj";
     public final static String TIMETABLE_SELECTED_NUM_NAME="selectedTimetable.obj";
+    public final static String THEME_SELECTED_NUM_NAME="selectidThemeNum.obj";
+    public final static String TRAIN_SHURUI_NAME="trainShuruiName.obj";
 
     /**
      * データを保存する

@@ -9,6 +9,7 @@
     <string name="edit_character">キャラクターを編集</string>
     <string name="change_character">キャラクターを選択</string>
     <string name="delete_character">キャラクターを削除</string>
+    <string name="setting">設定</string>
     <string name="hour">時</string>
     <string name="minute">分</string>
 </resources>

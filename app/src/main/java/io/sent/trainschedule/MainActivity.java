@@ -24,6 +24,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.io.IOException;
 import java.lang.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private Timetable timetable;
 
 
-
     static final int TRAIN_START_TIME=0;
     static final int TRAIN_FINISH_TIME=23;
     static final int REQUEST_CHARA_MAKE=1000;
@@ -62,13 +63,15 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_TIMETABLE_MAKE=1050;
     static final int REQUEST_TIMETABLE_EDIT=1060;
     static final int REQUEST_TIMETABLE_DELETE=1070;
+    static final int REQUEST_SETTING=1080;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        application=(ScheduleApplication)this.getApplication();
+        if(application.getThemeNum()!=1) setTheme(R.style.NoActionBarThemeDark);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        application=(ScheduleApplication)this.getApplication();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
@@ -82,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         application.saveCharaList();
         application.saveTimetableList();
+        application.saveThemeNum();
+        application.saveTrainShuruiName();
     }
 
     //ビューを見つける
@@ -112,11 +117,14 @@ public class MainActivity extends AppCompatActivity {
         numberPicker2.setMinValue(0);
         numberPicker2.setMaxValue(59);
         numberPicker2.setDescendantFocusability(TimePicker.FOCUS_BLOCK_DESCENDANTS);
+        checkBox1.setText(application.getTrainShuruiStr(application.MOST_FAST_LONG));
+        checkBox2.setText(application.getTrainShuruiStr(application.FAST_LONG));
+        checkBox3.setText(application.getTrainShuruiStr(application.SLOW_LONG));
         calendar=Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         imageView2.setImageBitmap(application.getSelectCharacter().charaImage);
 
-        application.uploadAdapter();
+        application.reloadAdapter();
         spinner.setAdapter(application.adapter);
         spinner.setSelection(application.getSelectedTimetableIndex());
         radioButton1.setChecked(true);
@@ -257,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
     //時刻を受け取り種類と時間を置き換えた文字を返す
     private String replaceTrainStr(Time time){
         String str=application.getSelectCharacter().normalText;
-        str=str.replaceAll("shurui",time.getShuruiStr());
+        str=str.replaceAll("shurui",application.getTrainShuruiStr(time.getShuruiNum()+3));
         str=str.replaceAll("time",time.hour+"時"+time.minute+"分");
         return str;
     }
@@ -363,6 +371,11 @@ public class MainActivity extends AppCompatActivity {
                             "io.sent.trainschedule.SelectTimetableActivity",REQUEST_TIMETABLE_DELETE);
                     toast("削除したい時刻表を選択してください");
                     break;
+
+                case R.id.setting:
+                    startActivityForResult(this, "io.sent.trainschedule",
+                            "io.sent.trainschedule.SettingActivity", REQUEST_SETTING);
+                    break;
             }
         }catch(Exception e){
             toast(e.getMessage());
@@ -421,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case REQUEST_TIMETABLE_MAKE:
-                    application.uploadAdapter();
+                    application.reloadAdapter();
                     spinner.setAdapter(application.adapter);
                     spinner.setSelection(application.getSelectedTimetableIndex());
                     searchTrainTime();
@@ -433,17 +446,28 @@ public class MainActivity extends AppCompatActivity {
 
                 case REQUEST_TIMETABLE_DELETE:
                     timetableDelete(intent.getIntExtra("index",-1));
-                    application.uploadAdapter();
+                    application.reloadAdapter();
                     spinner.setAdapter(application.adapter);
                     spinner.setSelection(application.getSelectedTimetableIndex());
                     searchTrainTime();
+                    break;
+
+                case REQUEST_SETTING:
+                    application.reloadAdapter();
+                    application.conversionStringToShurui();
+                    try {
+                        startActivity(new Intent(this, getClass()));
+                    }catch (Exception e){
+                        toast(e.getMessage());
+                    }
+                    finish();
                     break;
             }
 
 
         } else if (resultCode == RESULT_CANCELED) {
             if(requestCode ==REQUEST_TIMETABLE_MAKE){
-                application.uploadAdapter();
+                application.reloadAdapter();
                 spinner.setAdapter(application.adapter);
                 spinner.setSelection(application.getSelectedTimetableIndex());
                 searchTrainTime();

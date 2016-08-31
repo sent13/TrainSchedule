@@ -1,6 +1,8 @@
 package io.sent.trainschedule;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +14,10 @@ import android.widget.TextView;
  * Created by sent13 on 16/08/01.
  */
 public class EkimeiAdapter extends ArrayAdapter<String> {
-
-    public EkimeiAdapter( Context context, int resource) {
-
+    int themeNum;
+    public EkimeiAdapter( Context context, int resource,int themeNum) {
         super( context, resource);
+        this.themeNum=themeNum;
     }
 
 
@@ -52,8 +54,12 @@ public class EkimeiAdapter extends ArrayAdapter<String> {
     //** Spinnerの中身のTextViewを作る **//
     private void setCustomTextView( TextView textView, int position ) {
 
-        textView.setText( super.getItem( position ) );
-        textView.setTextColor(Color.BLACK);
+        textView.setText(super.getItem(position));
+        if(themeNum==1) {
+            textView.setTextColor(Color.BLACK);
+        }else{
+            textView.setTextColor(Color.WHITE);
+        }
     }
 }
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MyTheme">
+        <attr name="fukidasiRef" format="reference"></attr>
+        <attr name="adapterTextColor" format="color"></attr>
+        <attr name="charaMakeEditorRef" format="reference"></attr>
+    </declare-styleable>
+</resources>

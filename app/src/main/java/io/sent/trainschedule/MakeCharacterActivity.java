@@ -48,9 +48,10 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        application=(ScheduleApplication)this.getApplication();
+        if(application.getThemeNum()!=1) setTheme(R.style.NoActionBarThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.make_character);
-        application=(ScheduleApplication)this.getApplication();
         Toolbar toolbar = (Toolbar) findViewById(R.id.make_character_toolbar);
         setSupportActionBar(toolbar);
         findViews();

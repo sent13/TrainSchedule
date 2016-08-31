@@ -16,8 +16,8 @@
             android:id="@+id/select_timetable_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:background="@color/main_color"
+            app:popupTheme="@style/Theme.AppCompat" />
 
     </android.support.design.widget.AppBarLayout>
 

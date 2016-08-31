@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -15,28 +16,76 @@ import java.util.Objects;
  */
 public class ScheduleApplication extends Application{
 
+    public static final int THEME_LIGHT=1;
+    public static final int THEME_DARK=2;
+
+    public static final int MOST_FAST_SHORT=0;
+    public static final int FAST_SHORT=1;
+    public static final int SLOW_SHORT=2;
+    public static final int MOST_FAST_LONG=3;
+    public static final int FAST_LONG=4;
+    public static final int SLOW_LONG=5;
+
     private ArrayList<Character> charaList;
     private ArrayList<Timetable> timetableList;
     public ArrayAdapter<String> adapter;         //駅名のSpinnerようのアダプタ
     private int selectedCharacterIndex=0;
     private int selectedTimetableIndex=0;
+    private int selectedThemeNum=THEME_LIGHT;
+    private String trainSaveShuruiStr;              //電車の種類の名称を一つにまとめた文字列（保存用）
+
+    //電車種別の略称
+    private String[] shuruiStr;
+
 
     @Override
     public void onCreate(){
         super.onCreate();
-        adapter=new EkimeiAdapter(this,android.R.layout.simple_spinner_item);
+        adapter=new EkimeiAdapter(this,android.R.layout.simple_spinner_item, selectedThemeNum);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         initViews();
-
     }
 
     private void initViews(){
         loadCharaList();
         loadTimetableList();
+        loadThemeNum();
+        loadTrainShuruiName();
     }
 
     public ArrayList getCharaList(){
         return charaList;
+    }
+
+    public void setTrainSaveShuruiStr(String str){
+        trainSaveShuruiStr=str;
+    }
+
+    //電車の種類の名称を保存する
+    public void saveTrainShuruiName(){
+        DataUtil.store(this, trainSaveShuruiStr, DataUtil.TRAIN_SHURUI_NAME);
+    }
+
+    //電車の種類の名称を読み出す
+    public void loadTrainShuruiName(){
+        trainSaveShuruiStr=(String)DataUtil.load(this, DataUtil.TRAIN_SHURUI_NAME);
+
+        if(trainSaveShuruiStr==null){
+            trainSaveShuruiStr="新,快,普,新快速,快速,普通";
+        }
+        conversionStringToShurui();
+    }
+
+    //まとまった種類の文字列から個別の文字列に変換する
+    public void conversionStringToShurui(){
+        if(!trainSaveShuruiStr.equals("")) {
+            String [] shurui=trainSaveShuruiStr.split(",");
+            shuruiStr=shurui;
+        }
+    }
+
+    public String getTrainShuruiStr(int index){
+        return shuruiStr[index];
     }
 
     //キャラクターのリスト・選ばれているキャラクターの番号を保存する
@@ -62,6 +111,27 @@ public class ScheduleApplication extends Application{
             for(int i=0;i<charaList.size();i++){
                 charaList.get(i).restorationBitmap();
             }
+        }
+    }
+
+    public void saveThemeNum(){
+        DataUtil.store(this, selectedThemeNum, DataUtil.THEME_SELECTED_NUM_NAME);
+    }
+
+    public void loadThemeNum(){
+        Object object=DataUtil.load(this,DataUtil.THEME_SELECTED_NUM_NAME);
+        if(object!=null) selectedThemeNum=(int)object;
+    }
+
+    public int getThemeNum(){
+        return selectedThemeNum;
+    }
+
+    public void setThemeNum(int num){
+        if(num==1){
+            selectedThemeNum=THEME_LIGHT;
+        }else{
+            selectedThemeNum=THEME_DARK;
         }
     }
 
@@ -118,8 +188,8 @@ public class ScheduleApplication extends Application{
         }
     }
 
-    public void uploadAdapter(){
-        adapter=new EkimeiAdapter(this, android.R.layout.simple_spinner_item);
+    public void reloadAdapter(){
+        adapter=new EkimeiAdapter(this, android.R.layout.simple_spinner_item, selectedThemeNum);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         for(int i=0;i<timetableList.size();i++){
             adapter.add(timetableList.get(i).ekimei);

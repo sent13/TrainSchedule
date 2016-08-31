@@ -22,9 +22,10 @@ public class SelectTimetableActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        application=(ScheduleApplication)this.getApplication();
+        if(application.getThemeNum()!=1) setTheme(R.style.NoActionBarThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.select_timetable);
-        application=(ScheduleApplication)this.getApplication();
         initViews();
     }
 

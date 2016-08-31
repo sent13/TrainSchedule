@@ -15,12 +15,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/NoActionBarThemeLight">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,26 +30,28 @@
         <activity
             android:name=".MakeCharacterActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".MakeTimetableActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity
             android:name=".SelectCharacterActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".SelectTimetableActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".SettingActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

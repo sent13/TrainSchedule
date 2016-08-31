@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="io.sent.trainschedule.SelectCharacterActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/setting_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/main_color"
+            app:popupTheme="@style/Theme.AppCompat" />
+
+    </android.support.design.widget.AppBarLayout>
+
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="io.sent.trainschedule.SelectCharacterActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
+                android:layout_gravity="center_vertical"
+                android:text="アプリの基調"/>
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="right">
+
+                <RadioButton
+                    android:id="@+id/setting_theme_rdo_btn1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:text="Light"/>
+
+                <RadioButton
+                    android:id="@+id/setting_theme_rdo_btn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:text="Dark"/>
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/text_size"
+                android:text="種類名称の変更"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="略称"/>
+
+                    <EditText
+                        android:id="@+id/short_most_fast_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="4"
+                        android:singleLine="true"
+                        android:hint="例:新"/>
+
+                    <EditText
+                        android:id="@+id/short_fast_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="4"
+                        android:singleLine="true"
+                        android:hint="例:快"/>
+
+                    <EditText
+                        android:id="@+id/short_slow_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="4"
+                        android:singleLine="true"
+                        android:hint="例:普"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="名称"/>
+
+                    <EditText
+                        android:id="@+id/long_most_fast_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="6"
+                        android:singleLine="true"
+                        android:hint="例:新快速"/>
+
+                    <EditText
+                        android:id="@+id/long_fast_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="6"
+                        android:singleLine="true"
+                        android:hint="例:快速"/>
+
+                    <EditText
+                        android:id="@+id/long_slow_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLength="6"
+                        android:singleLine="true"
+                        android:hint="例:普通"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/setting_save_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="保存して終了"/>
+
+            <Button
+                android:id="@+id/setting_default_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="初期値に戻す"/>
+
+            <Button
+                android:id="@+id/setting_cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="キャンセル"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -19,24 +19,9 @@ public class Time {
         this.minute=minute;
     }
 
-    public String getShuruiStr(){
-        if(shurui==SINKAISOKU){
-            return "新快速";
-        }else if(shurui==KAISOKU){
-            return "快速";
-        }else{
-            return "普通";
-        }
+    public int getShuruiNum(){
+        return shurui-1;                //配列番号０からのため−１
     }
 
-    public String getShortShuruiStr(){
-        if(shurui==SINKAISOKU){
-            return "新";
-        }else if(shurui==KAISOKU){
-            return "快";
-        }else{
-            return "普";
-        }
-    }
 
 }

@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
             textResult1.setText(insertKaigyouCode(application.getSelectCharacter().noCheckedText));
             return;
         }else if (daiya.size() == 0) {
-            textResult1.setText(insertKaigyouCode(application.getSelectCharacter().noTrainText));
+            textResult1.setText(insertKaigyouCode(replaceNoTrainStr()));
             return;
         }
 
@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             setTime=firstShuruiTime(daiya);
             if(setTime==null) {
-                textResult1.setText(insertKaigyouCode(application.getSelectCharacter().noTrainText));
+                textResult1.setText(insertKaigyouCode(replaceNoTrainStr()));
             }else{
                 textResult1.setText(insertKaigyouCode(replaceTrainStr(setTime)));
             }
@@ -268,6 +268,28 @@ public class MainActivity extends AppCompatActivity {
         str=str.replaceAll("shurui",application.getTrainShuruiStr(time.getShuruiNum()+3));
         str=str.replaceAll("time",time.hour+"時"+time.minute+"分");
         return str;
+    }
+
+    //次の電車がない場合のshuruiを置き換えた文字列を返す
+    private String replaceNoTrainStr(){
+        String str=application.getSelectCharacter().noTrainText;
+        StringBuffer stringBuffer=new StringBuffer();
+        appendShuruiStr(checkBox1,stringBuffer,application.getTrainShuruiStr(application.MOST_FAST_LONG));
+        appendShuruiStr(checkBox2,stringBuffer,application.getTrainShuruiStr(application.FAST_LONG));
+        appendShuruiStr(checkBox3,stringBuffer,application.getTrainShuruiStr(application.SLOW_LONG));
+
+        str=str.replaceAll("shurui",stringBuffer.toString());
+        return str;
+    }
+
+    private void appendShuruiStr(CheckBox checkBox,StringBuffer stringBuffer,String str){
+        if(checkBox.isChecked()) {
+            if (stringBuffer.toString().equals("")) {
+                stringBuffer.append(str);
+            } else {
+                stringBuffer.append("、" + str);
+            }
+        }
     }
 
     //文字列を受け取り適切な位置で改行した文字列を返す

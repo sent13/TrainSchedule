@@ -21,105 +21,100 @@ tools:context="io.sent.trainschedule.MakeCharacterActivity">
 
 </android.support.design.widget.AppBarLayout>
 
-
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
+    <android.support.v4.app.FragmentTabHost
+        xmlns:android="http://schemas.android.com/apk/res/android"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="io.sent.trainschedule.MakeCharacterActivity">
-
-
-
-        <EditText
-            android:id="@+id/chara_name_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size"
-            android:hint="キャラクター名" />
-
-        <ImageView
-            android:id="@+id/chara_image"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/image_width" />
-
-        <Button
-            android:id="@+id/select_chara_imagebtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size"
-            android:text="画像を選択"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size"
-            android:text="通常の案内(shurui:種類 time:時刻)"/>
-
-        <EditText
-            android:id="@+id/chara_serif_normal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:textSize="@dimen/text_size"
-            android:background="?attr/charaMakeEditorRef"
-            android:lines="3" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size"
-            android:text="次の時間の電車がない場合の案内"/>
-
-        <EditText
-            android:id="@+id/chara_serif_no_train"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lines="2"
-            android:layout_margin="5dp"
-            android:textSize="@dimen/text_size"
-            android:background="?charaMakeEditorRef" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size"
-            android:text="チェックが入っていない場合の案内"/>
-
-        <EditText
-            android:id="@+id/chara_serif_no_checked"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lines="2"
-            android:layout_margin="5dp"
-            android:textSize="@dimen/text_size"
-            android:background="?attr/charaMakeEditorRef" />
+        android:id="@android:id/tabhost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/make_chara_btn"
-                android:layout_width="wrap_content"
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="40dp"
-                android:textSize="@dimen/text_size"
-                android:text="作成"/>
+                android:orientation="horizontal"
+                android:layout_weight="0" />
 
-            <Button
-                android:id="@+id/make_chara_cancel_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/text_size"
-                android:text="キャンセル"/>
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0" />
+
+            <LinearLayout
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:context="io.sent.trainschedule.MakeCharacterActivity">
+
+
+
+                <EditText
+                    android:id="@+id/chara_name_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size"
+                    android:hint="キャラクター名" />
+
+                <ImageView
+                    android:id="@+id/chara_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/image_width" />
+
+
+                <Button
+                    android:id="@+id/select_chara_imagebtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size"
+                    android:text="画像を選択"/>
+
+
+                <FrameLayout
+                    android:id="@+id/container"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/make_chara_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="40dp"
+                        android:textSize="@dimen/text_size"
+                        android:text="作成"/>
+
+                    <Button
+                        android:id="@+id/make_chara_cancel_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_size"
+                        android:text="キャンセル"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
         </LinearLayout>
 
-    </LinearLayout>
+    </android.support.v4.app.FragmentTabHost>
+
+
 
 
 

@@ -10,21 +10,20 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TabHost;
 import android.widget.Toast;
 
-import java.util.jar.Manifest;
-
-public class MakeCharacterActivity extends AppCompatActivity implements View.OnKeyListener{
+public class MakeCharacterActivity extends AppCompatActivity{
 
     private static final int REQUEST_CHOOSER=1000;
     private static int PERMISSION_REQUEST_CODE=1;
@@ -34,13 +33,12 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
     EditText charaNameEdit;
     ImageView charaImage;
     Button selectCharaImageBtn;
-    EditText charaSerifNormalEdit;      //通常時のセリフを入力するエディタ
-    EditText charaSerifNoTrainEdit;     //次の時間の電車がない場合のセリフを入力するエディタ
-    EditText charaSerifNoCheckedEdit;       //チェックが入っていない時のセリフを入力するエディタ
     Button makeCharaButton;
     Button cancelButton;
 
+    private RetCharaStrInterface charaStrInterface;
     private InputMethodManager inputMethodManager;
+
     private Uri m_uri;
     private Uri resultUri;
     private Bitmap bitmap;
@@ -58,20 +56,9 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
         initViews();
     }
 
-    private void findViews(){
-        charaNameEdit=(EditText)findViewById(R.id.chara_name_edit);
-        charaImage=(ImageView)findViewById(R.id.chara_image);
-        selectCharaImageBtn=(Button)findViewById(R.id.select_chara_imagebtn);
-        charaSerifNormalEdit=(EditText)findViewById(R.id.chara_serif_normal);
-        charaSerifNoTrainEdit=(EditText)findViewById(R.id.chara_serif_no_train);
-        charaSerifNoCheckedEdit=(EditText)findViewById(R.id.chara_serif_no_checked);
-        makeCharaButton=(Button)findViewById(R.id.make_chara_btn);
-        cancelButton=(Button)findViewById(R.id.make_chara_cancel_btn);
-
-        inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-    }
-
-    private void initViews(){
+    //Fragment作成時のコールバック、FragmentをこのActivityから参照可能にする
+    public void setCharaSerifInterface(){
+        charaStrInterface=(RetCharaStrInterface)getSupportFragmentManager().findFragmentById(R.id.container);
         Intent intent=getIntent();
         editCharaIndex=intent.getIntExtra("editCharaIndex", 0);
 
@@ -81,19 +68,69 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
             bitmap=editChara.charaImage;
             charaImage.setImageBitmap(bitmap);
             charaNameEdit.setText(editChara.name);
-            charaSerifNormalEdit.setText(editChara.normalText);
-            charaSerifNoTrainEdit.setText(editChara.noTrainText);
-            charaSerifNoCheckedEdit.setText(editChara.noCheckedText);
+            charaStrInterface.editCharaInit(editChara);
         }else{
             bitmap= BitmapFactory.decodeResource(getResources(),R.drawable.unknown);
             charaImage.setImageResource(R.drawable.unknown);
         }
+    }
+
+
+    private void findViews(){
+        charaNameEdit=(EditText)findViewById(R.id.chara_name_edit);
+        charaImage=(ImageView)findViewById(R.id.chara_image);
+        selectCharaImageBtn=(Button)findViewById(R.id.select_chara_imagebtn);
+        inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        makeCharaButton=(Button)findViewById(R.id.make_chara_btn);
+        cancelButton=(Button)findViewById(R.id.make_chara_cancel_btn);
+    }
+
+    private void initViews(){
+
+        // FragmentTabHost を取得しタブ構造にする
+        FragmentTabHost tabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
+        tabHost.setup(this, getSupportFragmentManager(), R.id.container);
+
+        TabHost.TabSpec tabSpec1, tabSpec2;
+
+        // TabSpec を生成する
+        tabSpec1 = tabHost.newTabSpec("tab1");
+        tabSpec1.setIndicator("最初から");
+        // TabHost に追加
+        tabHost.addTab(tabSpec1, DefMakeCharaFragment.class, null);
+
+        // TabSpec を生成する
+        tabSpec2 = tabHost.newTabSpec("tab2");
+        tabSpec2.setIndicator("サイトから");
+        // TabHost に追加
+        tabHost.addTab(tabSpec2, SiteMakeCharaFragment.class, null);
+
+        // リスナー登録
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                
+            }
+        });
+
+
         charaNameEdit.setMaxLines(1);
-        charaSerifNormalEdit.setMaxLines(3);
-        charaSerifNoTrainEdit.setMaxLines(2);
-        charaSerifNoCheckedEdit.setMaxLines(2);
+        charaNameEdit.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if((event.getAction()== android.view.KeyEvent.ACTION_DOWN) && (keyCode== android.view.KeyEvent.KEYCODE_ENTER)) {
 
-
+                    switch (v.getId()) {
+                        case R.id.chara_name_edit:
+                            inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(),
+                                    InputMethodManager.RESULT_SHOWN);
+                            break;
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
 
 
         //キャラの画像をギャラリーから選ぶ
@@ -101,17 +138,17 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
             @Override
             public void onClick(View v) {
                 //Android6.0以降ならパーミッションをチェックする
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     //許可が下りているなら実行
-                    if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)==
-                            PackageManager.PERMISSION_GRANTED){
+                    if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                            PackageManager.PERMISSION_GRANTED) {
                         selectGallery();
-                    }else{
+                    } else {
                         //許可がないなら許可を得る処理
                         requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}
-                                ,PERMISSION_REQUEST_CODE);
+                                , PERMISSION_REQUEST_CODE);
                     }
-                }else {
+                } else {
                     selectGallery();
                 }
             }
@@ -122,16 +159,22 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
             @Override
             public void onClick(View v) {
                 if (checkCharaMake()) {
-                    String name=charaNameEdit.getText().toString().trim();
-                    String normal=charaSerifNormalEdit.getText().toString().trim();
-                    String noTrain=charaSerifNoTrainEdit.getText().toString().trim();
-                    String noChecked=charaSerifNoCheckedEdit.getText().toString().trim();
-                    Character chara=new Character(bitmap, name, normal, noTrain, noChecked);
-                    if(editCharaIndex==0) {
+                    String name = charaNameEdit.getText().toString().trim();
+
+                    String charaSerif=charaStrInterface.getCharaSerif();
+                    String[] strings=charaSerif.split(",",-1);
+                    if(strings.length!=3){
+                        toast("作成できませんでした");
+                        return;
+                    }
+                    Character chara = new Character(bitmap, name, strings[0].trim(), strings[1].trim()
+                            , strings[2].trim());
+
+                    if (editCharaIndex == 0) {
                         application.addCharacter(chara);
                         application.setSelectedCharacterIndex(application.getCharaListSize() - 1);
-                    }else{
-                        application.setCharacter(editCharaIndex,chara);
+                    } else {
+                        application.setCharacter(editCharaIndex, chara);
                     }
                     setResult(RESULT_OK);
                     finish();
@@ -148,11 +191,11 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
             }
         });
 
-        charaNameEdit.setOnKeyListener(this);
-        charaSerifNormalEdit.setOnKeyListener(this);
-        charaSerifNoTrainEdit.setOnKeyListener(this);
-        charaSerifNoCheckedEdit.setOnKeyListener(this);
+
     }
+
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
@@ -166,30 +209,7 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
         }
     }
 
-    //キーボードでエンターキーが押された時の処理
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if((event.getAction()==KeyEvent.ACTION_DOWN) && (keyCode==KeyEvent.KEYCODE_ENTER)){
 
-            switch(v.getId()){
-                case R.id.chara_name_edit:
-                    charaSerifNormalEdit.requestFocus();
-                    break;
-                case R.id.chara_serif_normal:
-                    charaSerifNoTrainEdit.requestFocus();
-                    break;
-                case R.id.chara_serif_no_train:
-                    charaSerifNoCheckedEdit.requestFocus();
-                    break;
-                case R.id.chara_serif_no_checked:
-                    inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(),
-                            InputMethodManager.RESULT_SHOWN);
-                    break;
-            }
-            return true;
-        }
-        return false;
-    }
 
     private void selectGallery(){
         String photoName = System.currentTimeMillis() + ".jpg";
@@ -249,42 +269,52 @@ public class MakeCharacterActivity extends AppCompatActivity implements View.OnK
     //キャラクターを作成できる状態か判定しできないならエラーを表示
     private boolean checkCharaMake(){
         boolean flag=true;
-        String msg="";
+        StringBuffer msg=new StringBuffer("");
 
         String name,normal,noTrain,noCheckd;
         name=charaNameEdit.getText().toString().trim();
-        normal=charaSerifNormalEdit.getText().toString().trim();
-        noTrain=charaSerifNoTrainEdit.getText().toString().trim();
-        noCheckd=charaSerifNoCheckedEdit.getText().toString().trim();
 
         if(name.equals("")){
-            msg=msg.concat("キャラクターの名前が未入力です");
+            msg=msg.append("キャラクターの名前が未入力です");
             flag=false;
         }
+
+        String charaSerif=charaStrInterface.getCharaSerif();
+        String[] strings=charaSerif.split(",",-1);
+        if(strings.length!=3){
+            if(!msg.toString().equals("")) msg = msg.append("\n");
+            msg=msg.append("形式が正しくありません");
+            toast(msg.toString());
+            return false;
+        }
+        normal=strings[0].trim();
+        noTrain=strings[1].trim();
+        noCheckd=strings[2].trim();
+
         if(normal.equals("")){
-            if(!msg.equals("")) msg=msg.concat("\n");
-            msg=msg.concat("通常の案内が未入力です");
+            if(!msg.toString().equals("")) msg=msg.append("\n");
+            msg=msg.append("通常の案内が未入力です");
             flag=false;
         }
         if(noTrain.equals("")){
-            if(!msg.equals("")) msg=msg.concat("\n");
-            msg=msg.concat("電車がない場合が未入力です");
+            if(!msg.toString().equals("")) msg=msg.append("\n");
+            msg=msg.append("電車がない場合が未入力です");
             flag=false;
         }
         if(noCheckd.equals("")){
-            if(!msg.equals("")) msg=msg.concat("\n");
-            msg=msg.concat("チェックが入っていない場合が未入力です");
+            if(!msg.toString().equals("")) msg=msg.append("\n");
+            msg=msg.append("チェックが入っていない場合が未入力です");
             flag=false;
         }
         if(name.length()>=50 || normal.length()>=50 || noTrain.length()>=50 || noCheckd.length()>=50){
-            if(!msg.equals("")) msg=msg.concat("\n");
-            msg=msg.concat("文字数が50を超えている項目があります");
+            if(!msg.equals("")) msg=msg.append("\n");
+            msg=msg.append("文字数が50を超えている項目があります");
             flag=false;
         }
 
 
         if(flag==false){
-            toast(msg);
+            toast(msg.toString());
         }
 
         return flag;

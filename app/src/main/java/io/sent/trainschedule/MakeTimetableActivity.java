@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +23,7 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -32,20 +36,17 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
     private final int ADD_TIME=1;
     private final int REMOVE_TIME=2;
-    private final int MP=TableLayout.LayoutParams.MATCH_PARENT;
-    private final int WC=TableLayout.LayoutParams.WRAP_CONTENT;
-    private int ROW1_TITLE_WIDTH;
+
+
 
     private ScheduleApplication application;
 
-    private TextView rowText1Title;
 
     private EditText stationNameEdit;
     private Button addOrRemoveTimeButton;
     private Button saveTimetableButton;
     private Button makeTimetableButton;
     private Button cancelTimetableButton;
-    private TableLayout tableLayout;
     private InputMethodManager inputMethodManager;
     private AlertDialog.Builder alertDialogBuilder;
     private LayoutInflater inflater;
@@ -69,8 +70,39 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
     }
 
+    //Fragment作成時のコールバック、FragmentをこのActivityから参照可能にする
+    public void setFragment(){
+        Fragment fragment
+                =getSupportFragmentManager().findFragmentById(R.id.contain);
+
+        btnSwitching(fragment);
+    }
+
+    //フラグメントの中身によってダイアログ作成かサイトへアクセスかを切り替える
+    private void btnSwitching(Fragment fragment){
+        if(fragment instanceof DefMakeTimetableFragment ==true){
+            addOrRemoveTimeButton.setText("時刻を追加・\n削除");
+            addOrRemoveTimeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    makeDialog();
+                }
+            });
+        }else{
+            addOrRemoveTimeButton.setText("サイトへ");
+            addOrRemoveTimeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(Intent.ACTION_VIEW, Uri.
+                            parse("http://www.character-jikokuhyo.com/%E6%99%82%E5%88%BB%E8%A1%A8/"));
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+
     private void findViews(){
-        rowText1Title=(TextView)findViewById(R.id.rowtext1_title);
+
         stationNameEdit=(EditText)findViewById(R.id.stationNameEdit);
         addOrRemoveTimeButton=(Button)findViewById(R.id.addOrRemoveTimeBtn);
         saveTimetableButton=(Button)findViewById(R.id.saveTimetableBtn);
@@ -79,6 +111,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
         inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
+
         // カスタムビューを設定
         alertDialogBuilder = new AlertDialog.Builder(this);
         inflater = (LayoutInflater)this.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -86,6 +119,33 @@ public class MakeTimetableActivity extends AppCompatActivity {
     }
 
     private void initViews(){
+        // FragmentTabHost を取得しタブ構造にする
+        FragmentTabHost tabHost = (FragmentTabHost)findViewById(android.R.id.tabhost);
+        tabHost.setup(this, getSupportFragmentManager(), R.id.contain);
+
+        TabHost.TabSpec tabSpec1, tabSpec2;
+
+        // TabSpec を生成する
+        tabSpec1 = tabHost.newTabSpec("tab1");
+        tabSpec1.setIndicator("最初から");
+        // TabHost に追加
+        tabHost.addTab(tabSpec1, DefMakeTimetableFragment.class, null);
+
+        // TabSpec を生成する
+        tabSpec2 = tabHost.newTabSpec("tab2");
+        tabSpec2.setIndicator("サイトから");
+        // TabHost に追加
+        tabHost.addTab(tabSpec2, SiteMakeTimetableFragment.class, null);
+
+        // リスナー登録
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+            @Override
+            public void onTabChanged(String tabId) {
+                toast("タブが変わった");
+
+            }
+        });
+
         final Intent intent=getIntent();
         editNumber=intent.getIntExtra("editTimetableIndex",application.getTimetableListSize());
 
@@ -97,19 +157,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
         }
 
 
-        ViewTreeObserver observer = rowText1Title.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ROW1_TITLE_WIDTH=rowText1Title.getWidth();
-                makeTimeTable();
-                if (Build.VERSION.SDK_INT >= 16) {
-                    rowText1Title.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                } else {
-                    rowText1Title.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
-            }
-        });
+
 
         stationNameEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -123,12 +171,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
             }
         });
 
-        addOrRemoveTimeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                makeDialog();
-            }
-        });
+
 
         saveTimetableButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,77 +222,9 @@ public class MakeTimetableActivity extends AppCompatActivity {
             return true;
         }
     }
-    private void makeTimeTable(){
-        tableLayout = (TableLayout)findViewById(R.id.tableLayout);
-
-        for(int i=0; i<24; i++){
-            TableRow tableRow = (TableRow)getLayoutInflater().inflate(R.layout.table_row, null);
-            TextView rowHour = (TextView)tableRow.findViewById(R.id.rowtext1);
-            rowHour.setText("" + i);
-            rowHour.setWidth(ROW1_TITLE_WIDTH);
-            TextView rowHeijitu=(TextView)tableRow.findViewById(R.id.rowtext2);
-            rowHeijitu.setText("");
-            TextView rowKyujitu=(TextView)tableRow.findViewById(R.id.rowtext3);
-            rowKyujitu.setText("");
 
 
-            if((i+1)%2 == 0){
-                int color=getResources().getColor(R.color.lightgrey);
-                if(application.getThemeNum()!=1){
-                    color= getResources().getColor(R.color.black2);
-                }
-                rowHour.setBackgroundColor(color);
-                rowHeijitu.setBackgroundColor(color);
-                rowKyujitu.setBackgroundColor(color);
-            }else{
-                if(application.getThemeNum()!=1){
-                    int color= getResources().getColor(R.color.main_color);
-                    rowHour.setBackgroundColor(color);
-                    rowHeijitu.setBackgroundColor(color);
-                    rowKyujitu.setBackgroundColor(color);
-                }
-            }
 
-            tableLayout.addView(tableRow, new TableLayout.LayoutParams(MP, WC));
-        }
-        drawTimeTable();
-    }
-
-    private void drawTimeTable(){
-
-        //行の数だけ繰り返す
-        for(int i=0;i<tableLayout.getChildCount();i++){
-            TableRow tableRow=(TableRow)tableLayout.getChildAt(i);
-            TextView rowHeijitu=(TextView)tableRow.findViewById(R.id.rowtext2);
-            TextView rowKyujitu=(TextView)tableRow.findViewById(R.id.rowtext3);
-
-            StringBuffer strHeijitu=new StringBuffer();
-            StringBuffer strKyujitu=new StringBuffer();
-
-            //平日ダイヤの数だけ繰り返す
-            for(int j=0;j<timetable.heijituDaiya.size();j++){
-                Time heijituTime=timetable.heijituDaiya.get(j);
-                if(i==heijituTime.hour){
-                    strHeijitu.append(application.getTrainShuruiStr(heijituTime.getShuruiNum())
-                            +String.format("%02d  ",heijituTime.minute));
-                }
-            }
-
-            //休日ダイヤの数だけ繰り返す
-            for(int j=0;j<timetable.kyujituDaiya.size();j++){
-                Time kyujituTime=timetable.kyujituDaiya.get(j);
-                if(i==kyujituTime.hour){
-                    strKyujitu.append(application.getTrainShuruiStr(kyujituTime.getShuruiNum())
-                            +String.format("%02d  ",kyujituTime.minute));
-                }
-            }
-
-            rowHeijitu.setText(strHeijitu);
-            rowKyujitu.setText(strKyujitu);
-
-        }
-
-    }
 
     private void makeDialog(){
         layout = inflater.inflate(R.layout.timetable_dialog, (ViewGroup)findViewById(R.id.time_layout_root));
@@ -299,7 +274,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
                 } else {
                     toast("既に同じ時刻が追加されています");
                 }
-                drawTimeTable();
+                //drawTimeTable();
             }
         });
 
@@ -316,7 +291,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
                 }else{
                     toast("削除する時刻がありません");
                 }
-                drawTimeTable();
+                //drawTimeTable();
             }
         });
 

@@ -22,145 +22,106 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+    <android.support.v4.app.FragmentTabHost
+        xmlns:android="http://schemas.android.com/apk/res/android"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="io.sent.trainschedule.MakeTimetableActivity">
-
-
-        <EditText
-            android:id="@+id/stationNameEdit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size"
-            android:hint="駅名・方面" />
+        android:id="@android:id/tabhost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/addOrRemoveTimeBtn"
-                android:layout_width="wrap_content"
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="0" />
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0" />
+
+            <LinearLayout
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="@dimen/timetable_text_size"
-                android:text="時刻を追加\n・削除" />
-
-            <Button
-                android:id="@+id/saveTimetableBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="@dimen/timetable_text_size"
-                android:text="保存" />
-
-            <Button
-                android:id="@+id/makeTimetableBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="@dimen/timetable_text_size"
-                android:text="作成" />
-
-            <Button
-                android:id="@+id/cancelTimetableBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:textSize="@dimen/timetable_text_size"
-                android:text="キャン\nセル" />
-
-        </LinearLayout>
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="1dp"
-            android:stretchColumns="1,2">
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:context="io.sent.trainschedule.MakeTimetableActivity">
 
 
-            <TableRow>
+                <EditText
+                    android:id="@+id/stationNameEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size"
+                    android:hint="駅名・方面" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/addOrRemoveTimeBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/timetable_text_size"
+                        android:text="時刻を追加\n・削除" />
+
+                    <Button
+                        android:id="@+id/saveTimetableBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/timetable_text_size"
+                        android:text="保存" />
+
+                    <Button
+                        android:id="@+id/makeTimetableBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/timetable_text_size"
+                        android:text="作成" />
+
+                    <Button
+                        android:id="@+id/cancelTimetableBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textSize="@dimen/timetable_text_size"
+                        android:text="キャン\nセル" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/rowtext1_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="2dp"
-                        android:background="@drawable/text_solid"
-                        android:gravity="center"
-                        android:paddingBottom="2dp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="2dp"
-                        android:text="時"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/timetable_title_size" />
+                    <FrameLayout
+                        android:id="@+id/contain"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/rowtext2_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/text_solid"
-                    android:gravity="center"
-                    android:paddingBottom="2dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="2dp"
-                    android:text="平日"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/timetable_title_size" />
-
-                <TextView
-                    android:id="@+id/rowtext3_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="2dp"
-                    android:background="@drawable/text_solid"
-                    android:gravity="center"
-                    android:paddingBottom="2dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="2dp"
-                    android:text="休日"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/timetable_title_size" />
-            </TableRow>
-
-        </TableLayout>
 
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-            <TableLayout
-                android:id="@+id/tableLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.03"
-                android:shrinkColumns="1,2"
-                android:stretchColumns="1,2">
-
-
-            </TableLayout>
-
-        </ScrollView>
-
-    </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </android.support.v4.app.FragmentTabHost>
 
 
 </android.support.design.widget.CoordinatorLayout>

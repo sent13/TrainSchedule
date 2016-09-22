@@ -5,9 +5,26 @@
     tools:context="io.sent.trainschedule.SiteMakeTimetableFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="@dimen/text_size"
+            android:text="時刻表のテキストをペーストしてください"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textSize="@dimen/text_size"
+            android:lines="10" />
+
+    </LinearLayout>
 
 </FrameLayout>

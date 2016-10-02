@@ -14,7 +14,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 
-public class DefMakeTimetableFragment extends Fragment {
+public class DefMakeTimetableFragment extends Fragment implements RetTimetableStrInterface{
 
     View view;
     ScheduleApplication application;
@@ -29,6 +29,12 @@ public class DefMakeTimetableFragment extends Fragment {
     private TableLayout tableLayout;
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        timetable=new Timetable();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -36,7 +42,6 @@ public class DefMakeTimetableFragment extends Fragment {
         view=inflater.inflate(R.layout.fragment_def_make_timetable, container, false);
         application=(ScheduleApplication)getActivity().getApplication();
         ((MakeTimetableActivity)getActivity()).setFragment();
-        timetable=new Timetable();
         findViews();
         initViews();
         return view;
@@ -52,7 +57,7 @@ public class DefMakeTimetableFragment extends Fragment {
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                ROW1_TITLE_WIDTH=rowText1Title.getWidth();
+                ROW1_TITLE_WIDTH = rowText1Title.getWidth();
                 makeTimeTable();
                 if (Build.VERSION.SDK_INT >= 16) {
                     rowText1Title.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -96,10 +101,11 @@ public class DefMakeTimetableFragment extends Fragment {
 
             tableLayout.addView(tableRow, new TableLayout.LayoutParams(MP, WC));
         }
-        drawTimeTable();
+        drawTimetable();
     }
 
-    private void drawTimeTable(){
+    @Override
+    public void drawTimetable(){
 
         //行の数だけ繰り返す
         for(int i=0;i<tableLayout.getChildCount();i++){
@@ -133,5 +139,15 @@ public class DefMakeTimetableFragment extends Fragment {
 
         }
 
+    }
+
+    @Override
+    public Timetable getTimetable() {
+        return timetable;
+    }
+
+    @Override
+    public void editTimetableInit(int index) {
+        timetable=application.getTimetable(index);
     }
 }

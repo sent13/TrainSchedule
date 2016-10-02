@@ -5,7 +5,9 @@ package io.sent.trainschedule;
  */
 public interface RetTimetableStrInterface {
 
-    abstract public void setEditTimetable();        //defの時は受け取った番号の時刻表をそのままセットし表示、
-                                                    //siteの時は受け取った番号の時刻表を文字列に直しエディタにセット
+    abstract public Timetable getTimetable();       //フラグメントの持つタイムテーブルを返す
 
+    abstract public void editTimetableInit(int index);  //編集する場合に受け取った番号のタイムテーブルをそれぞれセット
+
+    abstract public void drawTimetable();
 }

@@ -40,7 +40,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
 
     private ScheduleApplication application;
-
+    private RetTimetableStrInterface retTimetableStrInterface;
 
     private EditText stationNameEdit;
     private Button addOrRemoveTimeButton;
@@ -52,7 +52,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
     private LayoutInflater inflater;
     private View layout;
 
-    private Timetable timetable;
+
     private int editNumber;             //時刻表を上書き、もしくは書き込む場所の番号
 
     @Override
@@ -72,15 +72,24 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
     //Fragment作成時のコールバック、FragmentをこのActivityから参照可能にする
     public void setFragment(){
-        Fragment fragment
-                =getSupportFragmentManager().findFragmentById(R.id.contain);
+        retTimetableStrInterface
+                =(RetTimetableStrInterface)getSupportFragmentManager().findFragmentById(R.id.contain);
+        editInit();
+        btnSwitching();
+    }
 
-        btnSwitching(fragment);
+    //時刻表を編集する場合の初期設定
+    private void editInit(){
+
+        if(editNumber!=application.getTimetableListSize()){
+            stationNameEdit.setText(application.getTimetable(editNumber).ekimei);
+            retTimetableStrInterface.editTimetableInit(editNumber);
+        }
     }
 
     //フラグメントの中身によってダイアログ作成かサイトへアクセスかを切り替える
-    private void btnSwitching(Fragment fragment){
-        if(fragment instanceof DefMakeTimetableFragment ==true){
+    private void btnSwitching(){
+        if(retTimetableStrInterface instanceof DefMakeTimetableFragment ==true){
             addOrRemoveTimeButton.setText("時刻を追加・\n削除");
             addOrRemoveTimeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -141,23 +150,13 @@ public class MakeTimetableActivity extends AppCompatActivity {
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {
-                toast("タブが変わった");
+
 
             }
         });
 
         final Intent intent=getIntent();
         editNumber=intent.getIntExtra("editTimetableIndex",application.getTimetableListSize());
-
-        if(editNumber==application.getTimetableListSize()){
-            timetable=new Timetable();
-        }else{
-            timetable=application.getTimetable(editNumber);
-            stationNameEdit.setText(timetable.ekimei);
-        }
-
-
-
 
         stationNameEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -208,18 +207,23 @@ public class MakeTimetableActivity extends AppCompatActivity {
             toast("駅名を入力してください");
             return false;
         }else{
-            timetable.setEkimei(name);
-            timetable.conversionTimeToString();
-            if(editNumber==application.getTimetableListSize()) {
-                application.addTimetable(timetable);
-                application.saveTimetableList();
-                toast("保存に成功しました");
+            Timetable timetable=retTimetableStrInterface.getTimetable();
+            if(timetable!=null) {
+                timetable.setEkimei(name);
+                timetable.conversionTimeToString();
+                if (editNumber == application.getTimetableListSize()) {
+                    application.addTimetable(timetable);
+                    application.saveTimetableList();
+                    toast("保存に成功しました");
+                } else {
+                    application.replaceTimetable(editNumber, timetable);
+                    application.saveTimetableList();
+                    toast("上書き保存に成功しました");
+                }
+                return true;
             }else{
-                application.replaceTimetable(editNumber,timetable);
-                application.saveTimetableList();
-                toast("上書き保存に成功しました");
+                return false;
             }
-            return true;
         }
     }
 
@@ -228,6 +232,8 @@ public class MakeTimetableActivity extends AppCompatActivity {
 
     private void makeDialog(){
         layout = inflater.inflate(R.layout.timetable_dialog, (ViewGroup)findViewById(R.id.time_layout_root));
+
+        final Timetable timetable=retTimetableStrInterface.getTimetable();
 
         Button dialogRemoveTimeBtn=(Button)layout.findViewById(R.id.dialogBtn1);
         Button dialogAddTimeBtn=(Button)layout.findViewById(R.id.dialogBtn2);
@@ -274,7 +280,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
                 } else {
                     toast("既に同じ時刻が追加されています");
                 }
-                //drawTimeTable();
+                retTimetableStrInterface.drawTimetable();
             }
         });
 
@@ -291,7 +297,7 @@ public class MakeTimetableActivity extends AppCompatActivity {
                 }else{
                     toast("削除する時刻がありません");
                 }
-                //drawTimeTable();
+                retTimetableStrInterface.drawTimetable();
             }
         });
 

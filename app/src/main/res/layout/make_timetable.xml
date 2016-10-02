@@ -93,7 +93,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:textSize="@dimen/timetable_text_size"
-                        android:text="作成" />
+                        android:text="保存して\n終了" />
 
                     <Button
                         android:id="@+id/cancelTimetableBtn"

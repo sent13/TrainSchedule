@@ -129,7 +129,7 @@ public class Timetable implements Serializable{
     }
 
     //文字列からArrayList<Time>を復元する
-    public void conversionStringToTime(){
+    public boolean conversionStringToTime(){
         if(heijituDaiya==null){
             heijituDaiya=new ArrayList<>();
         }
@@ -142,8 +142,26 @@ public class Timetable implements Serializable{
             String [] heijituStr=heijituDaiyaStr.split(",");
             for (String s : heijituStr) {
                 String[] temp = s.split(":");
-                heijituDaiya.add(new Time(Integer.parseInt(temp[0]),Integer.parseInt(temp[1]),
-                        Integer.parseInt(temp[2])));
+                if(temp.length!=3) return false;
+                try {
+                    if (temp[0].trim().equals("") || temp[1].trim().equals("") || temp[2].trim().equals(""))
+                        return false;
+                    if (isMakeAbleTimeCheck(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]))) {
+                        Time time = new Time(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]),
+                                Integer.parseInt(temp[2]));
+                        if (isSameTimeCheck(HEIJITU, time)) {
+                            addTime(HEIJITU,time);
+                        } else {
+                            heijituDaiya = new ArrayList<>();
+                            return false;
+                        }
+                    } else {
+                        heijituDaiya = new ArrayList<>();
+                        return false;
+                    }
+                }catch (NumberFormatException e){
+                    return false;
+                }
             }
         }
 
@@ -151,11 +169,34 @@ public class Timetable implements Serializable{
             String [] kyujituStr=kyujituDaiyaStr.split(",");
             for (String s : kyujituStr) {
                 String[] temp = s.split(":");
-                heijituDaiya.add(new Time(Integer.parseInt(temp[0]),Integer.parseInt(temp[1]),
-                        Integer.parseInt(temp[2])));
-
+                if(temp.length!=3) return false;
+                try {
+                    if (temp[0].trim().equals("") || temp[1].trim().equals("") || temp[2].trim().equals(""))
+                        return false;
+                    if (isMakeAbleTimeCheck(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]), Integer.parseInt(temp[2]))) {
+                        Time time = new Time(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]),
+                                Integer.parseInt(temp[2]));
+                        if (isSameTimeCheck(KYUJITU, time)) {
+                            addTime(KYUJITU,time);
+                        }
+                    } else {
+                        kyujituDaiya = new ArrayList<>();
+                        return false;
+                    }
+                }catch (NumberFormatException e){
+                    return false;
+                }
             }
         }
+        return true;
+    }
+
+    //引数の値で有効な時刻表を作れるか調べる
+    private boolean isMakeAbleTimeCheck(int shurui,int hour,int minute){
+        if ((1 <= shurui && shurui <= 3) && (0 <= hour && hour <= 23) && (0 <= minute && minute <= 59)) {
+            return true;
+        }
+        return false;
     }
 
     public void setEkimei(String name){

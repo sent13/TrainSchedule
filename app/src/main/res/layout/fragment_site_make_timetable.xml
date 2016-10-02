@@ -19,11 +19,12 @@
             android:text="時刻表のテキストをペーストしてください"/>
 
         <EditText
+            android:id="@+id/timetable_site_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:textSize="@dimen/text_size"
-            android:lines="10" />
+            android:lines="15" />
 
     </LinearLayout>
 
